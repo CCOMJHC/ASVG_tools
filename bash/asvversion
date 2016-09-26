@@ -1,0 +1,71 @@
+#!/bin/bash
+
+
+###########################################################################
+_OUTFILE="asvversion_$(uname -n)_$(date -u "+%Y-%m-%dT%H-%M-%S").tar.gz"
+
+_VFILE="asvversion.version"
+_BFILE="asvversion.boot"
+_DFILE="asvversion.dmesg"
+_VERSION="0.0.3"
+
+
+###########################################################################
+# Version File
+echo "## asvversion $_VERSION version file" > $_VFILE
+date >> $_VFILE
+
+echo "" >> $_VFILE
+echo "## OS Version ##" >> $_VFILE
+uname -a >> $_VFILE
+cat /etc/redhat-release 2>/dev/null >> $_VFILE
+
+echo "" >> $_VFILE
+echo "## Installed Packages ##" >> $_VFILE
+rpm -qa >> $_VFILE
+
+echo "" >> $_VFILE
+echo "## Running Services ##" >> $_VFILE
+service --status-all >> $_VFILE 2>&1
+
+
+###########################################################################
+# Boot File
+echo "## asvversion $_VERSION boot file" > $_BFILE
+date >> $_BFILE
+
+echo "" >> $_BFILE
+echo "## Boot Log ##" >> $_BFILE
+cat /var/log/boot.log >> $_BFILE
+
+echo "" >> $_BFILE
+echo "## Timeref Config ##" >> $_BFILE
+cat /etc/timeref.conf >> $_BFILE 2>&1
+
+
+###########################################################################
+# Devices File
+echo "## asvversion $_VERSION devices file" > $_DFILE
+date >> $_DFILE
+
+echo "" >> $_DFILE
+echo "## DMESG Output ##" >> $_DFILE
+dmesg >> $_DFILE
+
+echo "" >> $_DFILE
+echo "## Devices ##" >> $_DFILE
+ls --color=never /dev/ >> $_DFILE
+
+echo "" >> $_DFILE
+echo "## lspci ##" >> $_DFILE
+lspci >> $_DFILE
+
+echo "" >> $_DFILE
+echo "## lsusb ##" >> $_DFILE
+lsusb >> $_DFILE
+
+
+###########################################################################
+# Package Them Up
+tar -czf $_OUTFILE $_VFILE $_BFILE $_DFILE ~/.ccscm
+rm $_VFILE $_BFILE $_DFILE

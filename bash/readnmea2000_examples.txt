@@ -1,0 +1,32 @@
+# NMEA 2000 logs are split by device into separate files. "2" = compass, "4" = depth sensor
+# See below
+2016-09-14T13-54-55_1.vehicle
+2016-09-14T13-54-55_2.nmea2000
+2016-09-14T13-54-55_3.nmea0183
+2016-09-14T13-54-55_4.nmea2000
+2016-09-14T13-54-55_5.ais
+2016-09-14T14-09-56_1.vehicle
+2016-09-14T14-09-56_2.nmea2000
+2016-09-14T14-09-56_3.nmea0183
+2016-09-14T14-09-56_4.nmea2000
+2016-09-14T14-09-56_5.ais
+
+# Help and list of record numbers (pgn) supported:
+readme2000 -?
+
+# List the parameters for a particular record type (not tabular format)
+cat *_4.nmea2000 | readnmea2000 -Nt pgn128267
+
+cat *_4.nmea2000 | readnmea2000 -nt pgn128267
+
+# Extract only the time stamp and water depth:
+cat *_4.nmea2000 | readnmea2000 -t pgn128267=log_timestamp,transducer_water_depth
+
+# Extract depth, make it tab delimited.
+cat *_4.nmea2000 | readnmea2000 -t pgn128267=log_timestamp,transducer_water_depth | sed 's/ /\t/g'
+
+# Extract water temperature
+cat *_4.nmea2000 | readnmea2000 -t pgn130311=log_timestamp,temperature | sed 's/ /\t/g' > ../../../../2016-09-14_SeaTemperature.tab
+
+# Shows all the groups in the file.
+ cat *_4.nmea2000 | readnmea2000 -t paramGroup

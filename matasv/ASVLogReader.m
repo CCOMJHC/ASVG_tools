@@ -25,6 +25,7 @@ for i=1:Nfields
     fieldname = strrep(fieldname,')','');
     fieldname = strrep(fieldname,'%','Pct');
     fieldname = strrep(fieldname,'|','');
+    fieldname = strrep(fieldname,'-','_');
     if strcmp(fieldname(1),'1')
         fieldname = ['One' fieldname(2:end)];
     end

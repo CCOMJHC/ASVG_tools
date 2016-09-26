@@ -1,0 +1,26 @@
+
+ <outputConfig>
+  <type>csv</type>
+  <requiredData>
+   <id>"scm":2:12:0</id>
+   <id>"scm":2:12:1</id>
+   <id>"scm":2:12:2</id>
+   <id>"scm":2:12:3</id>
+   <id>"scm":2:12:4</id>
+   <id>"scm":2:12:5</id>
+   <id>"scm":2:12:6</id>
+   <id>"scm":2:12:7</id>
+   <id>"scm":2:4:"name"</id>
+   <id>"scm":2:4:"message"</id>
+   <id>"scm":2:4:"state"</id>
+   <id>"scm":2:3:"name"</id>
+   <id>"scm":2:3:"message"</id>
+  </requiredData>
+  <csvConfig>
+   <timeFormat>absolute</timeFormat>
+   <enumFormat>numeric</enumFormat>
+   <signSuffix>disable</signSuffix>
+   <columnHeaders>enable</columnHeaders>
+   <filename>OUTPUTDIR/vs_remote_control.csv</filename>
+  </csvConfig>
+ </outputConfig>
