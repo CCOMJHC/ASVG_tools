@@ -103,7 +103,7 @@ class asvlog(object):
                                 )
         return H
         
-    def save_to_mat(self,matfilename = ''):
+    def save_to_mat(self,matfilename = '',verbosity = 0):
         '''
         Method to save to MATLAB format
         '''
@@ -112,19 +112,43 @@ class asvlog(object):
         # See: http://stackoverflow.com/questions/30669137/python-pandas-dataframe-to-matlab-struct-using-scipy-io
         a_dict = {col_name : self.data[col_name].values \
             for col_name in self.data.columns.values}
+
+        if verbosity > 2:
+            print "Converting field names to MATLAAB compatible ones."                
             
-        # Modify the keys to MATLAB compatiable variable names.            
+        # Modify the keys to MATLAB compatiable variable names. (35 characters max)            
         for key in a_dict.keys():
             oldkey = key
             key = key.rstrip()
+            key = key.replace('Speed Control','SpeedCtl')
+            key = key.replace('Throttle Control','SpeedCtl')   
+            key = key.replace('Course Control','CourseCtl')
+            key = key.replace('Heading Control','HeadingCtl')
+            key = key.replace('Steering Control','SteeringCtl')
+            key = key.replace('Drive Train','DrvTrn')
+            key = key.replace('Proportional','Kp')
+            key = key.replace('Derivative','Kd')
+            key = key.replace('Integral','Ki')
+            key = key.replace('Commanded','Cmded')
+            key = key.replace('Position','Pos')
+            key = key.replace('Measured','Meas')
+            key = key.replace('Engine','Eng')
+            key = key.replace('Desired','Des')
+            key = key.replace('Effort','Eff')
+            key = key.replace('Temperature','Temp')
+            key = key.replace('Control','Ctrl')
+            key = key.replace(' | ','_')
             key = key.replace(' ','_')
             key = key.replace('(','_')
             key = key.replace(')','')
             key = key.replace('%','Pct')
-            key = key.replace('|','')
+            
+            key = key.replace('|','_')
             if key.startswith('1'):
                 key = 'One' + key[1:]
-        
+
+            if verbosity > 2:            
+                print "\tOriginal Field: " + oldkey + "\t\tNew Field:" + key + ' (' + str(key.__len__()) + ')'
             a_dict[key] = a_dict.pop(oldkey)
 
         # This step creates a structure having the file name with fields for each key in a_dict.
