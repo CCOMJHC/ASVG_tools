@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on Tue Oct  4 06:24:47 2016
@@ -239,24 +240,24 @@ for root, dirnames, filenames in os.walk(directory):
 
 print nmea2000filestoprocess
 
-# Process CSV data produced from the Data Export Tool.
 for nmeafile in nmea2000filestoprocess:
 
     print "Parsing " + nmeafile
-    outputfilename = os.path.join(nmeafile[:-4] + )        
+
 
     for idx in range(0,nmea2000logtypes.__len__()-1):
 
+
         if type == nmea2000logtypes[idx] or type == "all":
 
-            cmd = ('bin/cat | ' + nmeafile + '| readnmea2000 -t ' +
+            cmd = ('/bin/cat ' + nmeafile + ' | readnmea2000 -t ' +
             nmea2000logtypes[idx]) + '='
 
             for field in nmea2000fieldnames[idx]:
-            
                 cmd += field + ','
 
-        
+        outputfilename = os.path.join(outputdir,os.path.basename(nmeafile[:-4]) + '_' + nmea2000logtypes[idx] + '.tab')
+        cmd += ' > ' + outputfilename
         print ("Executing: " + cmd)
 # cat *_4.nmea2000 | readnmea2000 -t pgn128267=log_timestamp,transducer_water_depth | sed 's/ /\t/g'
     
