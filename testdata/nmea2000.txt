@@ -1,0 +1,165 @@
+Name:	paramGroup
+	log_timestamp log_date log_time CAN_data CAN_data_size pgn source 
+	priority destination newline 
+
+Name:	pgn126992
+	log_timestamp log_date log_time sequence_id time_source day time_of_day 
+	timestamp CAN_data CAN_data_size pgn source priority destination 
+	newline 
+
+Name:	pgn126996
+	log_timestamp log_date log_time database_version product_code model_id 
+	software_version model_version model_serial certification_level 
+	load_equivalency CAN_data CAN_data_size pgn source priority destination 
+	newline 
+
+Name:	pgn127250
+	log_timestamp log_date log_time sequence_id heading_sensor_reading 
+	deviation variation heading_sensor_reference CAN_data CAN_data_size pgn 
+	source priority destination newline 
+
+Name:	pgn127251
+	log_timestamp log_date log_time sequence_id rate_of_turn CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn127257
+	log_timestamp log_date log_time sequence_id yaw pitch roll CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn127258
+	log_timestamp log_date log_time sequence_id variation_source 
+	age_of_service variation CAN_data CAN_data_size pgn source priority 
+	destination newline 
+
+Name:	pgn127488
+	log_timestamp log_date log_time engine_instance engine_speed 
+	engine_boost_pressure engine_tilt CAN_data CAN_data_size pgn source 
+	priority destination newline 
+
+Name:	pgn127489
+	log_timestamp log_date log_time engine_instance engine_oil_pressure 
+	engine_oil_temperature engine_temperature alternator_potential 
+	fuel_rate total_engine_hours engine_coolant_pressure fuel_pressure 
+	engine_tilt check_engine over_temperature low_oil_pressure 
+	low_oil_level low_fuel_pressure low_system_voltagelow_coolant_level 
+	water_flow water_in_fuel charge_indicator preheat_indicator 
+	high_boost_pressure rev_limit_exceeded egr_system 
+	throttle_position_sensor engine_emergency_stop_mode warning_level_1 
+	warning_level_2 power_reduction maintenance_needed engine_comm_error 
+	sub_or_secondary_throttle neutral_start_protect engine_shutting_down 
+	percent_engine_load percent_engine_torque CAN_data CAN_data_size pgn 
+	source priority destination newline 
+
+Name:	pgn127493
+	log_timestamp log_date log_time transmission_instance transmission_gear 
+	transmission_oil_pressure transmission_oil_temperature 
+	check_temperature over_temperature low_oil_pressure low_oil_level 
+	sail_drive CAN_data CAN_data_size pgn source priority destination 
+	newline 
+
+Name:	pgn127497
+	log_timestamp log_date log_time instance trip_fuel_used 
+	average_fuel_rate economy_fuel_rate inst_fuel_economy CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn127505
+	log_timestamp log_date log_time fluid_instance fluid_type fluid_level 
+	tank_capacity CAN_data CAN_data_size pgn source priority destination 
+	newline 
+
+Name:	pgn127506
+	log_timestamp log_date log_time sequence_id dc_instance dc_type 
+	state_of_charge state_of_health time_remaining ripple_voltage 
+	cumulative_charge_drawn CAN_data CAN_data_size pgn source priority 
+	destination newline 
+
+Name:	pgn127508
+	log_timestamp log_date log_time battery_instance battery_voltage 
+	battery_current battery_case_temperature sequence_id CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn128259
+	log_timestamp log_date log_time sequence_id water_speed ground_speed 
+	referenced_type speed_direction CAN_data CAN_data_size pgn source 
+	priority destination newline 
+
+Name:	pgn128267
+	log_timestamp log_date log_time sequence_id transducer_water_depth 
+	transducer_offset maximum_depth_range CAN_data CAN_data_size pgn source 
+	priority destination newline 
+
+Name:	pgn128275
+	log_timestamp log_date log_time measurement_day measurement_time_of_day 
+	cumulative_distance distance_since_reset CAN_data CAN_data_size pgn 
+	source priority destination newline 
+
+Name:	pgn129025
+	log_timestamp log_date log_time latitude longitude CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn129026
+	log_timestamp log_date log_time sequence_id cog_reference 
+	course_over_ground speed_over_ground CAN_data CAN_data_size pgn source 
+	priority destination newline 
+
+Name:	pgn129029
+	log_timestamp log_date log_time sequence_id timestamp date time 
+	position_day position_time_of_day latitude longitude altitude 
+	system_type gnss_method gnss_integrity space_vehicles horizontal_dop 
+	positional_dop geoidal_separation reference_stations CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn129033
+	log_timestamp log_date log_time timestamp date time day time_of_day 
+	local_time_offset CAN_data CAN_data_size pgn source priority 
+	destination newline 
+
+Name:	pgn129540
+	log_timestamp log_date log_time sequence_id residual_mode 
+	space_vehicles CAN_data CAN_data_size pgn source priority destination 
+	newline 
+
+Name:	pgn130306
+	log_timestamp log_date log_time sequence_id wind_speed wind_direction 
+	wind_reference CAN_data CAN_data_size pgn source priority destination 
+	newline 
+
+Name:	pgn130310
+	log_timestamp log_date log_time sequence_id water_temperature 
+	ambient_temperature atmospheric_pressure CAN_data CAN_data_size pgn 
+	source priority destination newline 
+
+Name:	pgn130311
+	log_timestamp log_date log_time sequence_id temperature_instance 
+	humidity_instance temperature humidity atmospheric_pressure CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn130312
+	log_timestamp log_date log_time sequence_id temperature_instance 
+	temperature_source actual_temperature control_temperature CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn130313
+	log_timestamp log_date log_time sequence_id humidity_instance 
+	humidity_source actual_humidity control_humidity CAN_data CAN_data_size 
+	pgn source priority destination newline 
+
+Name:	pgn130314
+	log_timestamp log_date log_time sequence_id pressure_instance 
+	pressure_source pressure CAN_data CAN_data_size pgn source priority 
+	destination newline 
+
+Name:	pgn130316
+	log_timestamp log_date log_time sequence_id temperature_instance 
+	temperature_source actual_temperature control_temperature CAN_data 
+	CAN_data_size pgn source priority destination newline 
+
+Name:	pgn59904
+	log_timestamp log_date log_time requested_pgn CAN_data CAN_data_size 
+	pgn source priority destination newline 
+
+Name:	pgn60928
+	log_timestamp log_date log_time identity_number manufacturer_code 
+	device_instance device_function device_class system_instance 
+	industry_group CAN_data CAN_data_size pgn source priority destination 
+	newline

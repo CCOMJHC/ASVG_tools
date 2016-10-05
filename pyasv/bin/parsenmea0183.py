@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Created on Tue Oct  4 06:24:47 2016
@@ -6,7 +7,6 @@ Created on Tue Oct  4 06:24:47 2016
 """
 
 import _mypath
-import sys
 import os
 import argparse
 
@@ -27,7 +27,7 @@ parser.add_argument("-v", "--verbosity",
 parser.add_argument("-o", "--outputdir",
                     action = "store",
                     default = ".",
-                    help = "Specify the output directory for parsed MATLAB files. 'i' = put files in input log directory [default='.']")
+                    help = "Specify the output directory for parsed MATLAB files. [default='.']")
 
 # Get list of files to parse.
 args = parser.parse_args()
@@ -39,20 +39,22 @@ outputdir =         args.outputdir
 ########################## NMEA 0183 ##################################        
 GPStypestoparse = ['GGA','RMC','VTG'] # Not currently parsing GSV or GLL
 
+thisdir = os.path.dirname(__file__)
+gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser.py')
 # Specify the output directory name.
 # Default is the cwd ('./'). -i gives the input directory. 
-if outputdir == 'i':
-    outputdir = os.path.join(directory,'device')
 
 for logtype in GPStypestoparse:
-    cmd = ('gpsparser.py ',
-           ' -d ' + os.path.join(directory,'device') + '::.nmea0183',
+    cmd = (gpsparser + 
+           ' -g ' + os.path.join(directory,'device') + '::nmea0183'
     ' -s ' + logtype + ' -o ' + outputdir)
    
     if verbose > 1:
         print "Executing: " + cmd
-
-    try:
-        os.system(cmd)
-    except:
-        print "Failed executing: " + cmd
+        
+    if not dryrun:
+        try:
+            os.system(cmd)
+        except:
+            print "Failed executing: " + cmd
+            
