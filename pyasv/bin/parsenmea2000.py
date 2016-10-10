@@ -52,7 +52,7 @@ if verbose >= 1:
 ###################### NMEA 2000 #################################    
 # A list of the NMEA 2000 log types supported by the ASV Global readnmea2000 tool
 # which extract logs from their proprietary log file format. 
-nmea2000logtypes = [
+nmea2000logtypes = ['paramGroup',
 'pgn126992',
 'pgn126996',
 'pgn127250',
@@ -88,21 +88,21 @@ nmea2000logtypes = [
 # Below are lists of the fields available for each of the log types above.
 nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
                         "CAN_data_size","pgn","source", "priority",
-                        "destination","newline"],
+                        "destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","time_source","day",
           "time_of_day","timestamp","CAN_data","CAN_data_size","pgn","source",
-          "priority","destination","newline"],
+          "priority","destination"],
 
 	["log_timestamp","log_date","log_time","database_version","product_code",
       "model_id","software_version","model_version","model_serial",
       "certification_level","load_equivalency","CAN_data","CAN_data_size",
-      "pgn","source","priority","destination","newline"],
+      "pgn","source","priority","destination"],
       
 	["log_timestamp","log_date","log_time","sequence_id",
       "heading_sensor_reading","deviation","variation",
       "heading_sensor_reference","CAN_data","CAN_data_size","pgn","source",
-      "priority","destination","newline"],
+      "priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","rate_of_turn",
       "CAN_data","CAN_data_size","pgn","source","priority","destination",
@@ -110,15 +110,15 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
 
 	["log_timestamp","log_date","log_time","sequence_id","yaw","pitch",
       "roll","CAN_data","CAN_data_size","pgn","source","priority",
-      "destination","newline"],
+      "destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "variation_source","age_of_service","variation","CAN_data",
-      "CAN_data_size","pgn","source","priority","destination","newline"],
+      "CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","engine_instance","engine_speed",
       "engine_boost_pressure","engine_tilt","CAN_data","CAN_data_size","pgn",
-      "source","priority","destination","newline"],
+      "source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","engine_instance",
       "engine_oil_pressure","engine_oil_temperature","engine_temperature",
@@ -134,25 +134,25 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
       
       ["log_timestamp","log_date","log_time","instance","trip_fuel_used",
       "average_fuel_rate","economy_fuel_rate","inst_fuel_economy","CAN_data",
-      "CAN_data_size","pgn","source","priority","destination","newline"],
+      "CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","fluid_instance","fluid_type",
       "fluid_level","tank_capacity","CAN_data","CAN_data_size","pgn","source",
-      "priority","destination","newline"],
+      "priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","dc_instance",
       "dc_type","state_of_charge","state_of_health","time_remaining",
       "ripple_voltage","cumulative_charge_drawn","CAN_data","CAN_data_size",
-      "pgn","source","priority","destination","newline"],
+      "pgn","source","priority","destination"],
       
 	["log_timestamp","log_date","log_time","battery_instance",
       "battery_voltage","battery_current","battery_case_temperature",
       "sequence_id","CAN_data","CAN_data_size","pgn","source","priority",
-      "destination","newline"],
+      "destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","water_speed",
       "ground_speed","referenced_type","speed_direction","CAN_data",
-      "CAN_data_size","pgn","source","priority","destination","newline"],
+      "CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "transducer_water_depth","transducer_offset","maximum_depth_range",
@@ -170,7 +170,7 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
 
 	["log_timestamp","log_date","log_time","sequence_id","cog_reference",
       "course_over_ground","speed_over_ground","CAN_data","CAN_data_size",
-      "pgn","source","priority","destination","newline"],
+      "pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","timestamp",
       "date","time","position_day","position_time_of_day","latitude",
@@ -180,15 +180,15 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
       
 	["log_timestamp","log_date","log_time","timestamp","date","time","day",
       "time_of_day","local_time_offset","CAN_data","CAN_data_size","pgn",
-      "source","priority","destination","newline"],
+      "source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","residual_mode"
      ,"space_vehicles","CAN_data","CAN_data_size","pgn","source","priority",
-     "destination","newline"],
+     "destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","wind_speed",
       "wind_direction","wind_reference","CAN_data","CAN_data_size","pgn",
-      "source","priority","destination","newline"],
+      "source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "water_temperature","ambient_temperature","atmospheric_pressure",
@@ -198,67 +198,122 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
 	["log_timestamp","log_date","log_time","sequence_id",
       "temperature_instance","humidity_instance","temperature",
       "humidity","atmospheric_pressure","CAN_data","CAN_data_size","pgn",
-      "source","priority","destination","newline"],
+      "source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "temperature_instance","temperature_source","actual_temperature",
       "control_temperature","CAN_data","CAN_data_size","pgn","source",
-      "priority","destination","newline"],
+      "priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "humidity_instance","humidity_source","actual_humidity",
       "control_humidity","CAN_data","CAN_data_size","pgn","source",
-      "priority","destination","newline"],
+      "priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "pressure_instance","pressure_source","pressure","CAN_data",
-      "CAN_data_size","pgn","source","priority","destination","newline"],
+      "CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "temperature_instance","temperature_source","actual_temperature",
       "control_temperature","CAN_data","CAN_data_size","pgn","source",
-      "priority","destination","newline"],
+      "priority","destination"],
 
 	["log_timestamp","log_date","log_time","requested_pgn","CAN_data",
-      "CAN_data_size","pgn","source","priority","destination","newline"],
+      "CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","identity_number",
       "manufacturer_code","device_instance","device_function","device_class",
       "system_instance","industry_group","CAN_data","CAN_data_size","pgn",
-      "source","priority","destination","newline"]
+      "source","priority","destination"]
 ]
 
+## NEW STRATEGY
+# Iniitally I wanted to process each file individually for all log
+# types. While this is good for auditing what has been parsed and what
+# has not, it retains the mess of logs that ASV Global has created. I
+# think it better to try to clean them up here. So lets make this
+# simplier. 
+
+cmd = ('/bin/cat ' + 
+       directory + '/*.nmea2000 | ' + 
+       ' readnmea2000 -t paramGroup=pgn | tr \' \' \'\n\' | ' +
+       ' sort | uniq -c | awk \'{print $2, "\t",$1}\' > ' + 
+       outputdir + '/logsummary.txt')
+
+try:
+    os.system(cmd)
+except:
+    print "Unable to execute: " + cmd
+    sys.exit()
+
+for line in file(outputdir + '/logsummary.txt','r'):
+    pgncnt = line.split('\t')
+    pgn = 'pgn' + pgncnt[0].rstrip()
+    pgnnum = pgncnt[1].rstrip()
+
+    if verbose >=1:
+        print "PGN: " + pgn + ', NUM: ' + pgnnum
+
+    # If the pgn parsed from above is not in our list, skip it.
+    if nmea2000logtypes.count(pgn) == 0:
+        if verbose >= 1:
+            print 'pgn unknown: ' + pgn
+        continue
+
+    cmd = '/bin/cat ' + '*.nmea2000 | readnmea2000 -t ' + pgn + '='
+    for field in nmea2000fieldnames[nmea2000logtypes.index(pgn)]:
+        cmd += field + ','
+
+    outputfile = os.path.join(outputdir,pgn + '.txt')
+
+    if verbose >= 1:
+        print 'Opening: ' + outputfile
+
+    fid = open(outputfile,'w')
+    fid.write(' '.join(nmea2000fieldnames[nmea2000logtypes.index(pgn)]))
+    fid.close()
+
+    cmd += ' >> ' + outputfile
+    if verbose >= 1:
+        print 'Executing ' + cmd
+    
+    if not dryrun:
+        os.system(cmd)
+
+# # Recursively look for data files in the specified directory. 
+# nmea2000filestoprocess = []
+
+# ######################### NMEA2000 LOGS #############################
+# for root, dirnames, filenames in os.walk(directory):
+#     for filename in fnmatch.filter(filenames,'*.nmea2000'):
+#         nmea2000filestoprocess.append(os.path.join(root,filename))
+
+# print nmea2000filestoprocess
+
+# for nmeafile in nmea2000filestoprocess:
+
+#     print "Parsing " + nmeafile
 
 
-# Recursively look for data files in the specified directory. 
-nmea2000filestoprocess = []
-
-######################### CSV LOGS #############################
-for root, dirnames, filenames in os.walk(directory):
-    for filename in fnmatch.filter(filenames,'*.nmea2000'):
-        nmea2000filestoprocess.append(os.path.join(root,filename))
-
-print nmea2000filestoprocess
-
-for nmeafile in nmea2000filestoprocess:
-
-    print "Parsing " + nmeafile
+#     for idx in range(0,nmea2000logtypes.__len__()-1):
 
 
-    for idx in range(0,nmea2000logtypes.__len__()-1):
+#         if type == nmea2000logtypes[idx] or type == "all":
 
+#             cmd = ('/bin/cat ' + nmeafile + ' | readnmea2000 -t ' +
+#             nmea2000logtypes[idx]) + '='
 
-        if type == nmea2000logtypes[idx] or type == "all":
+#             for field in nmea2000fieldnames[idx]:
+#                 cmd += field + ','
 
-            cmd = ('/bin/cat ' + nmeafile + ' | readnmea2000 -t ' +
-            nmea2000logtypes[idx]) + '='
+#         outputfilename = os.path.join(outputdir,os.path.basename(nmeafile[:-4]) + '_' + nmea2000logtypes[idx] + '.tab')
 
-            for field in nmea2000fieldnames[idx]:
-                cmd += field + ','
+#         cmd += ' > ' + outputfilename
+#         print ("Executing: " + cmd)
+# 	if not dryrun:
+# 		os.system(cmd)
 
-        outputfilename = os.path.join(outputdir,os.path.basename(nmeafile[:-4]) + '_' + nmea2000logtypes[idx] + '.tab')
-        cmd += ' > ' + outputfilename
-        print ("Executing: " + cmd)
-# cat *_4.nmea2000 | readnmea2000 -t pgn128267=log_timestamp,transducer_water_depth | sed 's/ /\t/g'
+# # cat *_4.nmea2000 | readnmea2000 -t pgn128267=log_timestamp,transducer_water_depth | sed 's/ /\t/g'
     
     
