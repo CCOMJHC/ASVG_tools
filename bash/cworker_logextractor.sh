@@ -45,6 +45,7 @@ if [ "$tmp" == "" ]; then
     echo "    $tmp/extracted_logs"
 fi
 outputdir="$tmp/extracted_logs/"
+outputdir=`realpath $outputdir`
 
 # TODO: Check to see that the output directory exist and either fail
 # or make it.   
@@ -69,7 +70,7 @@ done
 
 # Get the user's selection. 
 echo "Type (cut/paste) the directory(s) to process, with 'Enter' after
-each. Type'q' to quit."
+each. Or type '*' to process all of them. Type'q' to quit."
 read datadir
 while [ "$datadir" != 'q' ]; do
 
@@ -83,8 +84,7 @@ while [ "$datadir" != 'q' ]; do
 	# while here?
 	# echo "Checking $ccscm/$datadir..."
 	if [ -e "$ccscm/scm-vp/$datadir" ]; then
-    
-            datadirs=( "${datadirs[@]}" $datadir )
+                datadirs=( "${datadirs[@]}" $datadir )
 	else
     	    echo "That data directory does not exist. Try again. ('q' to quit)."
 	fi
@@ -95,9 +95,16 @@ while [ "$datadir" != 'q' ]; do
 
 done
 
+if [ ! -e /usr/local/bin/data-export-cli ]; then
+    echo "Unable to find the data export tool: data-export-cli"
+    exit
+fi
+
+
 # Process the data. 
 for datadir in ${datadirs[@]}; do
 
+    echo "Extracting ASV C-Worker Binary Logs..."
     # Define and create the output directory.
     complete_outputdir="$outputdir/$datadir"
     outputspec="$complete_outputdir/$datadir.exs"
@@ -113,7 +120,7 @@ for datadir in ${datadirs[@]}; do
     # we expected to be able to do it in a single go. 
     # create_export_config.sh "$complete_outputdir" > "$outputspec"
 
-    # Go to the output directory and create the configu files. 
+    # Go to the output directory and create the config files. 
     cd "$complete_outputdir/configs"
     create_export_configs.sh "$complete_outputdir" 
     cd ..
@@ -137,10 +144,19 @@ for datadir in ${datadirs[@]}; do
 	procs=`jobs | grep Running`
     
     done
+
+    echo ""
+    echo "Parsing nmea0183 logs..."
+    parsenmea0183.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir -v
+    echo ""
+    echo "Parsing nmea2000 logs..."
+    parsenmea2000.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir -v
+
     echo ""
     echo "Export of $datadir complete."
     # Go back to the original location. 
     cd "$cwd"
 done
+
 
 
