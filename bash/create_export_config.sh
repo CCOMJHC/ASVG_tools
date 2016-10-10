@@ -7,4 +7,5 @@
 #
 # outputdirectory = path to the directory into which the extracted data will be place. 
 
-cat $HOME/bin/template_export_config.exs | sed s:OUTPUTDIR:$1:g
+TEMPLATE=/home/unmanned/gitsrc/ASVG_tools/bash/template_export_config.exs
+cat $TEMPLATE | sed s:OUTPUTDIR:$1:g
