@@ -85,6 +85,43 @@ nmea2000logtypes = ['paramGroup',
 'pgn60928',
 ]
 
+# The text title of each pgn code listed above. Note the list above is
+# not the complete list, but rather the complete list supported by the
+# ASV Global readnmea2000 tool.  
+nmea2000logsummary = ['parameters',
+'system_time',
+'product_info',
+'vessel_heading',
+'rate_of_turn',
+'attitude',
+'magnetic_variation'
+'engine_parameters',
+'engine_parameters_dynamic',
+'transmission_parameters_dynamic',
+'trip_parameters_engine',
+'fluid_level',
+'dc_detailed_status',
+'battery_status',
+'speed_water_referenced',
+'water_depth',
+'distance_log',
+'position_rapid_update',
+'cog_sog_rapid_update',
+'attitude_delta_high_precision_rapid_update',
+'gnss_position_data',
+'date_time',
+'gnss_sats_in_view',
+'wind_data',
+'environmental_parameters_1',
+'environmental_parameters_2',
+'temperature',
+'humidity',
+'actual_pressure',
+'unknown'
+'iso_request',
+'iso_address_claim'
+]
+
 # Below are lists of the fields available for each of the log types above.
 nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
                         "CAN_data_size","pgn","source", "priority",
@@ -235,11 +272,14 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
 # think it better to try to clean them up here. So lets make this
 # simplier. 
 
+# Get a summary of the available logs types. 
 cmd = ('/bin/cat ' + 
-       directory + '/*.nmea2000 | ' + 
+       os.path.join(os.path.join(directory,'device'),'*.nmea2000') + ' | ' + 
        ' readnmea2000 -t paramGroup=pgn | tr \' \' \'\n\' | ' +
        ' sort | uniq -c | awk \'{print $2, "\t",$1}\' > ' + 
-       outputdir + '/logsummary.txt')
+       outputdir + '/nmea2000_logsummary.txt')
+if verbose >= 1:
+    print "Getting summary info. Executing " + cmd
 
 try:
     os.system(cmd)
@@ -247,7 +287,8 @@ except:
     print "Unable to execute: " + cmd
     sys.exit()
 
-for line in file(outputdir + '/logsummary.txt','r'):
+# For each logtype present, parse them. 
+for line in file(outputdir + '/nmea2000_logsummary.txt','r'):
     pgncnt = line.split('\t')
     pgn = 'pgn' + pgncnt[0].rstrip()
     pgnnum = pgncnt[1].rstrip()
@@ -261,11 +302,19 @@ for line in file(outputdir + '/logsummary.txt','r'):
             print 'pgn unknown: ' + pgn
         continue
 
-    cmd = '/bin/cat ' + '*.nmea2000 | readnmea2000 -t ' + pgn + '='
+    # Create the commdand to cat the nmea 2000 logs into the reader. 
+    cmd = ('/bin/cat ' + 
+           os.path.join(os.path.join(directory,'device'),'*.nmea2000') +
+           ' | readnmea2000 -t ' + pgn + '=')
+
+    # Append the fields to extract.
     for field in nmea2000fieldnames[nmea2000logtypes.index(pgn)]:
         cmd += field + ','
 
-    outputfile = os.path.join(outputdir,pgn + '.txt')
+    outputfile = os.path.join(outputdir,
+                              ('nmea2000_'+ 
+                               nmea2000logsummary[nmea2000logtypes.index(pgn)]
+                               + '_' + pgn + '.txt'))
 
     if verbose >= 1:
         print 'Opening: ' + outputfile
@@ -274,6 +323,7 @@ for line in file(outputdir + '/logsummary.txt','r'):
     fid.write(' '.join(nmea2000fieldnames[nmea2000logtypes.index(pgn)]))
     fid.close()
 
+    # Redirect the output to the output file. 
     cmd += ' >> ' + outputfile
     if verbose >= 1:
         print 'Executing ' + cmd

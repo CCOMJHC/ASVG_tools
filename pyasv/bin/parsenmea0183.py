@@ -40,16 +40,19 @@ outputdir =         args.outputdir
 GPStypestoparse = ['GGA','RMC','VTG'] # Not currently parsing GSV or GLL
 
 thisdir = os.path.dirname(__file__)
-gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser.py')
+gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser/gpsparser.py')
 # Specify the output directory name.
 # Default is the cwd ('./'). -i gives the input directory. 
 
 for logtype in GPStypestoparse:
-    cmd = (gpsparser + 
-           ' -g ' + os.path.join(directory,'device') + '::nmea0183'
-    ' -s ' + logtype + ' -o ' + outputdir)
+    cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*nmea0183') 
+           + ' | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
+           os.path.join(outputdir,logtype + '.txt'))
+    #cmd = (gpsparser + 
+    #       ' -g ' + os.path.join(directory,'device') + '::nmea0183' +
+    #' -s ' + logtype + ' -o ' + outputdir)
    
-    if verbose > 1:
+    if verbose >= 1:
         print "Executing: " + cmd
         
     if not dryrun:
