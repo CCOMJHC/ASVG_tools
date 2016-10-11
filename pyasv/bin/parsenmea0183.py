@@ -43,10 +43,10 @@ thisdir = os.path.dirname(__file__)
 gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser/gpsparser.py')
 # Specify the output directory name.
 # Default is the cwd ('./'). -i gives the input directory. 
-
+# Note the grep removes non-ASCII characters, which come with the AIS logs.
 for logtype in GPStypestoparse:
     cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*nmea0183') 
-           + ' | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
+           + ' | grep -v -P "[[:^ascii:]]" | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
            os.path.join(outputdir,logtype + '.txt'))
     #cmd = (gpsparser + 
     #       ' -g ' + os.path.join(directory,'device') + '::nmea0183' +
