@@ -299,7 +299,7 @@ for line in file(outputdir + '/nmea2000_logsummary.txt','r'):
     # If the pgn parsed from above is not in our list, skip it.
     if nmea2000logtypes.count(pgn) == 0:
         if verbose >= 1:
-            print 'pgn unknown: ' + pgn
+            print 'PGN unknown: ' + pgn
         continue
 
     # Create the commdand to cat the nmea 2000 logs into the reader. 

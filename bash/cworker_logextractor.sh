@@ -25,7 +25,7 @@ if [ $1 == "-h" ]; then
 fi
 
 # An environment varialbe we'll eventually set.
-ASVG_TOOLS="/home/asvuser/gitsrc/ASVG_tools/"
+#ASVG_TOOLS="/home/asvuser/gitsrc/ASVG_tools/"
 
 # The first argument is the path to the ccscm log directory. 
 ccscm=$1
@@ -131,18 +131,25 @@ for datadir in ${datadirs[@]}; do
 
     # Then find all the config files we generated and process each. 
     echo "Processing $datadir..."
-    configstoprocess=`find . -type f | grep export_config.exs`
-    for config in ${configstoprocess[@]}; do
-	echo "Processing $config"
-	data-export-cli -d "$ccscm/scm-vp/$datadir" \
-	    -x "$config" 2>&1 >> $complete_outputdir/export.log &
-    done
-  
+
+    data-export-cli -d "$ccscm/scm-vp/$datadir" \
+     	-x "$outputspec" 2>&1 >> $complete_outputdir/export.log  
+
+    # In this block, separate processes were launched for each export 
+    # and these were monitored for completion. 
     # This was useful when running separate exports was required.
+    # It no longer is, so we run just the ingle line above. 
+    # configstoprocess=`find . -type f | grep export_config.exs`
+    # for config in ${configstoprocess[@]}; do
+    # 	echo "Processing $config"
+    # 	data-export-cli -d "$ccscm/scm-vp/$datadir" \
+    # 	    -x "$config" 2>&1 >> $complete_outputdir/export.log &
+    # done
+    #
     # secs=0
     # procs=`jobs | grep Running`
     # while [ "$procs" != "" ]; do
-
+    #
     # 	echo "Processing $datadir, ${secs}s elapsed..."
     # 	sleep 1
     # 	secs=`echo "$secs+1" | bc`
@@ -153,21 +160,21 @@ for datadir in ${datadirs[@]}; do
 
     echo ""
     echo "Parsing CSV files for MATLAB."
-    ${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d $complete_outputdir -o i -v
+    ${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d $complete_outputdir -o i 
     echo ""
 
     echo ""
     echo "Parsing nmea0183 logs..."
-    ${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir -v
+    ${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir 
     echo ""
     echo "Parsing nmea2000 logs..."
-    ${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir -v
+    ${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir 
 
     echo ""
     echo "Export of $datadir complete."
     # Go back to the original location. 
     cd "$cwd"
-    exit
+    
 done
 
 
