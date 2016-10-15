@@ -142,8 +142,7 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
       "priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","rate_of_turn",
-      "CAN_data","CAN_data_size","pgn","source","priority","destination",
-      "newline"],
+      "CAN_data","CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","yaw","pitch",
       "roll","CAN_data","CAN_data_size","pgn","source","priority",
@@ -193,17 +192,14 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "transducer_water_depth","transducer_offset","maximum_depth_range",
-      "CAN_data","CAN_data_size","pgn","source","priority","destination",
-      "newline"],
+      "CAN_data","CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","measurement_day",
       "measurement_time_of_day","cumulative_distance","distance_since_reset",
-      "CAN_data","CAN_data_size","pgn","source","priority","destination",
-      "newline"],
+      "CAN_data","CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","latitude","longitude",
-      "CAN_data","CAN_data_size","pgn","source","priority","destination",
-      "newline"],
+      "CAN_data","CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id","cog_reference",
       "course_over_ground","speed_over_ground","CAN_data","CAN_data_size",
@@ -229,8 +225,7 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "water_temperature","ambient_temperature","atmospheric_pressure",
-      "CAN_data","CAN_data_size","pgn","source","priority","destination",
-      "newline"],
+      "CAN_data","CAN_data_size","pgn","source","priority","destination"],
 
 	["log_timestamp","log_date","log_time","sequence_id",
       "temperature_instance","humidity_instance","temperature",
@@ -320,7 +315,7 @@ for line in file(outputdir + '/nmea2000_logsummary.txt','r'):
         print 'Opening: ' + outputfile
 
     fid = open(outputfile,'w')
-    fid.write(' '.join(nmea2000fieldnames[nmea2000logtypes.index(pgn)]))
+    fid.write(' '.join(nmea2000fieldnames[nmea2000logtypes.index(pgn)])+"\n")
     fid.close()
 
     # Redirect the output to the output file. 
