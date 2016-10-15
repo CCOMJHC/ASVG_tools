@@ -24,6 +24,9 @@ if [ $1 == "-h" ]; then
     exit
 fi
 
+# An environment varialbe we'll eventually set.
+#ASVG_TOOLS="/home/asvuser/gitsrc/ASVG_tools/"
+
 # The first argument is the path to the ccscm log directory. 
 ccscm=$1
 
@@ -107,7 +110,7 @@ for datadir in ${datadirs[@]}; do
     echo "Extracting ASV C-Worker Binary Logs..."
     # Define and create the output directory.
     complete_outputdir="$outputdir/$datadir"
-    outputspec="$complete_outputdir/$datadir.exs"
+    outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
     echo "mkdir $complete_outputdir"
     mkdir -p "$complete_outputdir/configs/"
 
@@ -118,44 +121,60 @@ for datadir in ${datadirs[@]}; do
     # exports in a single file. So separate export configuration files
     # had to be generated for each. This line hails from a time when
     # we expected to be able to do it in a single go. 
-    # create_export_config.sh "$complete_outputdir" > "$outputspec"
-
+    #cd "$complete_outputdir/configs"
+    ${ASVG_TOOLS}/bash/create_export_config.sh "$complete_outputdir" > "$outputspec"
+    echo "$outputspec"
     # Go to the output directory and create the config files. 
-    cd "$complete_outputdir/configs"
-    create_export_configs.sh "$complete_outputdir" 
-    cd ..
+    
+    #create_export_configs.sh "$complete_outputdir" 
+    cd $complete_outputdir
 
     # Then find all the config files we generated and process each. 
     echo "Processing $datadir..."
-    configstoprocess=`find . -type f | grep export_config.exs`
-    for config in ${configstoprocess[@]}; do	
-	data-export-cli -d "$ccscm/scm-vp/$datadir" \
-	    -x "$config" 2>&1 > $complete_outputdir/export.log &
-    done
 
-    secs=0
-    procs=`jobs | grep Running`
-    while [ "$procs" != "" ]; do
+    data-export-cli -d "$ccscm/scm-vp/$datadir" \
+     	-x "$outputspec" 2>&1 >> $complete_outputdir/export.log  
 
-	echo "Processing $datadir, ${secs}s elapsed..."
-	sleep 1
-	secs=`echo "$secs+1" | bc`
-	tput cuu 1
-	procs=`jobs | grep Running`
+    # In this block, separate processes were launched for each export 
+    # and these were monitored for completion. 
+    # This was useful when running separate exports was required.
+    # It no longer is, so we run just the ingle line above. 
+    # configstoprocess=`find . -type f | grep export_config.exs`
+    # for config in ${configstoprocess[@]}; do
+    # 	echo "Processing $config"
+    # 	data-export-cli -d "$ccscm/scm-vp/$datadir" \
+    # 	    -x "$config" 2>&1 >> $complete_outputdir/export.log &
+    # done
+    #
+    # secs=0
+    # procs=`jobs | grep Running`
+    # while [ "$procs" != "" ]; do
+    #
+    # 	echo "Processing $datadir, ${secs}s elapsed..."
+    # 	sleep 1
+    # 	secs=`echo "$secs+1" | bc`
+    # 	tput cuu 1
+    # 	procs=`jobs | grep Running`
     
-    done
+    # done
+
+    echo ""
+    echo "Parsing CSV files for MATLAB."
+    ${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d $complete_outputdir -o i 
+    echo ""
 
     echo ""
     echo "Parsing nmea0183 logs..."
-    parsenmea0183.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir -v
+    ${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir 
     echo ""
     echo "Parsing nmea2000 logs..."
-    parsenmea2000.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir -v
+    ${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d $ccscm/scm-vp/$datadir -o $complete_outputdir 
 
     echo ""
     echo "Export of $datadir complete."
     # Go back to the original location. 
     cd "$cwd"
+    
 done
 
 
