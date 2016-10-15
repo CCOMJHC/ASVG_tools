@@ -80,8 +80,10 @@ class asvlog(object):
         To get a list of fields use data.columns
         '''
         
-        self.data = pandas.read_csv(self.pathandfile,header=0,index_col=0)
-        self.data.index = pandas.to_datetime((self.data.index.values),unit='s')
+        # self.data = pandas.read_csv(self.pathandfile,header=0,index_col=0)
+        self.data = pandas.read_csv(self.pathandfile,header=0)
+        # self.data.index = pandas.to_datetime((self.data.index.values),unit='s')
+        self.data.index = pandas.to_datetime((self.data['Epoch Time (s)']),unit='s')
         self.fields = self.data.columns  
         
     def plot(self):
@@ -137,6 +139,7 @@ class asvlog(object):
             key = key.replace('Effort','Eff')
             key = key.replace('Temperature','Temp')
             key = key.replace('Control','Ctrl')
+            key = key.replace(' (','_')
             key = key.replace(' | ','_')
             key = key.replace(' ','_')
             key = key.replace('(','_')

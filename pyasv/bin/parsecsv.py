@@ -83,7 +83,7 @@ for csvfile in csvfilestoprocess:
     # Save the data.
     print "Writing " + os.path.join(outputdir,outmatfilename)
     if not dryrun:
-        log.save_to_mat(matfilename = os.path.join(outputdir,outmatfilename) )
+        log.save_to_mat(matfilename = os.path.join(outputdir,outmatfilename), verbosity=verbose )
 
 
 
