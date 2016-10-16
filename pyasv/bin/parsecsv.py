@@ -45,17 +45,28 @@ dryrun =            args.dryrun
 verbose =           args.verbosity
 outputdir =         args.outputdir
 
+if directory.startswith('"') and directory.endswith('"'):
+    directory = directory[1:-1]
+if outputdir.startswith('"') and outputdir.endswith('"'):
+    outputdir = outputdir[1:-1]
+
 #filestoprocess = glob.glob(directory + '/*.csv')
 
 # Recursively look for data files in the specified directory. 
 csvfilestoprocess = []
 
 
+if verbose >= 1:
+    print("Arguments:")
+    arguments = vars(args)
+    for key, value in arguments.iteritems():
+        print("\t%s:\t\t%s" % (key,str(value)))
+
+
 ######################### CSV LOGS #############################
 for root, dirnames, filenames in os.walk(directory):
     for filename in fnmatch.filter(filenames,'*.csv'):
         csvfilestoprocess.append(os.path.join(root,filename))
-
 
 # Process CSV data produced from the Data Export Tool.
 for csvfile in csvfilestoprocess:

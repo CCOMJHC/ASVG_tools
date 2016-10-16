@@ -36,7 +36,7 @@ while getopts ":rewqhd:o:" opt; do
 	    ;;
 	o)  
 	    GOTOUTPUT=1
-	    outputdir=${OPTARG}/extracted_logs
+	    outputdir=${OPTARG}
 	    ;;
 	h)
 	    PRINTHELP=1
@@ -211,10 +211,12 @@ for datadir in ${datadirs[@]}; do
 
     echo "Extracting ASV C-Worker Binary Logs..."
     # Define and create the output directory.
-    complete_outputdir="$outputdir/$datadir"
+    complete_outputdir="${outputdir}/extracted_logs/${datadir}"
     outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
-    echo "mkdir $complete_outputdir"
-    mkdir -p "$complete_outputdir/configs/"
+    if [ "$DOCW4" = "1" ]; then
+	echo "mkdir $complete_outputdir"
+	mkdir -p "$complete_outputdir/configs/"
+	fi
 
     # Capture where the command was executed from.
     cwd=`pwd`
@@ -262,7 +264,9 @@ for datadir in ${datadirs[@]}; do
     # done
 
     fi
-
+    
+    # Note the escaped quotes in these lines help the code handle spaces in a file or directory name. 
+    # These have to be stripped off however inside the python code.
 
     if [ "$DOCSV" == 1 ]; then
 	echo ""
