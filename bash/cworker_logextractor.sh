@@ -38,7 +38,7 @@ while getopts ":rewqhd:o:" opt; do
 	    DO0183=1
 	    ;;
 	d) 
-	    ccscm=${OPTARG}
+	    ccscm=`realpath ${OPTARG}`
 	    ;;
 	o)  
 	    GOTOUTPUT=1
@@ -228,50 +228,53 @@ for datadir in ${datadirs[@]}; do
     cwd=`pwd`
 
     if [ "$DOCW4" == 1 ]; then
-    # A bug in data-export-cli utility will not support multiple
-    # exports in a single file. So separate export configuration files
-    # had to be generated for each. This line hails from a time when
-    # we expected to be able to do it in a single go. 
-    #cd "$complete_outputdir/configs"
+	# A bug in data-export-cli utility will not support multiple
+	# exports in a single file. So separate export configuration files
+	# had to be generated for each. This line hails from a time when
+	# we expected to be able to do it in a single go.
+	#cd "$complete_outputdir/configs"
 	${ASVG_TOOLS}/bash/create_export_config.sh "$complete_outputdir" > "$outputspec"
 	echo "$outputspec"
-    # Go to the output directory and create the config files. 
-    
-    #create_export_configs.sh "$complete_outputdir" 
-	cd $complete_outputdir
+	# Go to the output directory and create the config files.
+	#cd $complete_outputdir
 
-    # Then find all the config files we generated and process each. 
+	pwd
+
+	# Then find all the config files we generated and process each.
 	echo "Processing $datadir..."
+	echo "   /usr/local/bin/data-export-cli -d \""${ccscm}/scm-vp/${datadir}"\" \
+     	    -x \""${outputspec}"\" 2>&1 >> \""${complete_outputdir}/export.log\"""
 
-	data-export-cli -d "$ccscm/scm-vp/$datadir" \
-     	    -x "$outputspec" 2>&1 >> $complete_outputdir/export.log  
+	#/usr/local/bin/data-export-cli -d \""${ccscm}/scm-vp/${datadir}"\" \
+     	#    -x \""${outputspec}"\" 2>&1 >> \""${complete_outputdir}/export.log\""
 
-    # In this block, separate processes were launched for each export 
-    # and these were monitored for completion. 
-    # This was useful when running separate exports was required.
-    # It no longer is, so we run just the ingle line above. 
-    # configstoprocess=`find . -type f | grep export_config.exs`
-    # for config in ${configstoprocess[@]}; do
-    # 	echo "Processing $config"
-    # 	data-export-cli -d "$ccscm/scm-vp/$datadir" \
-    # 	    -x "$config" 2>&1 >> $complete_outputdir/export.log &
-    # done
-    #
-    # secs=0
-    # procs=`jobs | grep Running`
-    # while [ "$procs" != "" ]; do
-    #
-    # 	echo "Processing $datadir, ${secs}s elapsed..."
-    # 	sleep 1
-    # 	secs=`echo "$secs+1" | bc`
-    # 	tput cuu 1
-    # 	procs=`jobs | grep Running`
-    
-    # done
+	/usr/local/bin/data-export-cli -d "${ccscm}/scm-vp/${datadir}" -x "${outputspec}"
+
+	# In this block, separate processes were launched for each export
+	# and these were monitored for completion.
+	# This was useful when running separate exports was required.
+	# It no longer is, so we run just the ingle line above.
+	# configstoprocess=`find . -type f | grep export_config.exs`
+	# for config in ${configstoprocess[@]}; do
+	# 	echo "Processing $config"
+	# 	data-export-cli -d "$ccscm/scm-vp/$datadir" \
+	# 	    -x "$config" 2>&1 >> $complete_outputdir/export.log &
+	# done
+	#
+	# secs=0
+	# procs=`jobs | grep Running`
+	# while [ "$procs" != "" ]; do
+	#
+	# 	echo "Processing $datadir, ${secs}s elapsed..."
+	# 	sleep 1
+	# 	secs=`echo "$secs+1" | bc`
+	# 	tput cuu 1
+	# 	procs=`jobs | grep Running`
+
+	# done
 
     fi
-    
-    # Note the escaped quotes in these lines help the code handle spaces in a file or directory name. 
+    # Note the escaped quotes in these lines help the code handle spaces in a file or directory name.
     # These have to be stripped off however inside the python code.
 
     if [ "$DOCSV" == 1 ]; then
@@ -285,21 +288,21 @@ for datadir in ${datadirs[@]}; do
 	echo ""
     fi
 
-    if [ "$DO0183" = 1 ]; then 
+    if [ "$DO0183" = 1 ]; then
 	echo ""
 	echo "Parsing nmea0183 logs..."
-	${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \""${ccscm}/scm-vp/${datadir}"\" -o \""${complete_outputdir}"\" 
+	${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \""${ccscm}/scm-vp/${datadir}"\" -o \""${complete_outputdir}"\"
 	echo ""
     fi
 
     if [ "$DO2000" = 1 ]; then
 	echo "Parsing nmea2000 logs..."
-	${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d \""${ccscm}/scm-vp/${datadir}"\" -o \""${complete_outputdir}"\" 
+	${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d \""${ccscm}/scm-vp/${datadir}"\" -o \""${complete_outputdir}"\"
     fi
 
     echo ""
     echo "Export of $datadir complete."
-    # Go back to the original location. 
+    # Go back to the original location.
     cd "$cwd"
-    
+
 done
