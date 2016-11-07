@@ -7,7 +7,13 @@
 #
 #
 # TO DO:
-# Add the ability to export all log directories.
+
+if [ -e ~/.ASVG_tools.conf ]; then
+	source ~/.ASVG_tools.conf
+else
+	echo "Unable to config .ASVG_tools.conf in home directory."
+	exit
+fi
 
 DOCW4=0
 DOCSV=0
