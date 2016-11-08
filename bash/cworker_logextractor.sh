@@ -198,7 +198,7 @@ while [ "$datadir" != 'q' ]; do
 	fi
 
 	read datadir
-    
+
     fi # End check for '*'
 
 done
@@ -215,7 +215,7 @@ fi
 for datadir in ${datadirs[@]}; do
 
 
-    echo "Extracting ASV C-Worker Binary Logs..."
+
     # Define and create the output directory.
     complete_outputdir="${outputdir}/extracted_logs/${datadir}"
     outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
@@ -233,6 +233,8 @@ for datadir in ${datadirs[@]}; do
 	# had to be generated for each. This line hails from a time when
 	# we expected to be able to do it in a single go.
 	#cd "$complete_outputdir/configs"
+	echo "Extracting ASV C-Worker Binary Logs..."
+	echo "   Creating export configuration..."
 	${ASVG_TOOLS}/bash/create_export_config.sh "$complete_outputdir" > "$outputspec"
 	echo "$outputspec"
 	# Go to the output directory and create the config files.
@@ -241,7 +243,7 @@ for datadir in ${datadirs[@]}; do
 	pwd
 
 	# Then find all the config files we generated and process each.
-	echo "Processing $datadir..."
+	echo "   Processing $datadir..."
 	echo "   /usr/local/bin/data-export-cli -d \""${ccscm}/scm-vp/${datadir}"\" \
      	    -x \""${outputspec}"\" 2>&1 >> \""${complete_outputdir}/export.log\"""
 
@@ -279,7 +281,7 @@ for datadir in ${datadirs[@]}; do
 
     if [ "$DOCSV" == 1 ]; then
 	echo ""
-	echo "Parsing CSV files for MATLAB."
+	echo "   Parsing CSV files for MATLAB."
 	if [ "$DOCW4" == 1 ]; then
 	    ${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \""${complete_outputdir}"\" -o i -vv
 	else
@@ -290,7 +292,7 @@ for datadir in ${datadirs[@]}; do
 
     if [ "$DO0183" = 1 ]; then
 	echo ""
-	echo "Parsing nmea0183 logs..."
+	echo "   Parsing nmea0183 logs..."
 	${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \""${ccscm}/scm-vp/${datadir}"\" -o \""${complete_outputdir}"\"
 	echo ""
     fi
