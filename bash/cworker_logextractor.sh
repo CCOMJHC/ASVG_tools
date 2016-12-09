@@ -22,7 +22,7 @@ DO0183=0
 PRINTHELP=0
 GOTOUTPUT=0
 
-while getopts ":rewqhda:o:" opt; do
+while getopts ":rewqhad:o:" opt; do
 
     case $opt in 
 	r) 
