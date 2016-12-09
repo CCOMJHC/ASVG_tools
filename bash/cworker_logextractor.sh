@@ -22,7 +22,7 @@ DO0183=0
 PRINTHELP=0
 GOTOUTPUT=0
 
-while getopts ":rewqhd:o:" opt; do
+while getopts ":rewqhda:o:" opt; do
 
     case $opt in 
 	r) 
@@ -299,7 +299,7 @@ for datadir in ${datadirs[@]}; do
 
     if [ "$DO2000" = 1 ]; then
 	echo "Parsing nmea2000 logs..."
-	${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d \""${ccscm}/scm-vp/${datadir}"\" -o \""${complete_outputdir}"\"
+	${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d "${ccscm}/scm-vp/${datadir}" -o "${complete_outputdir}"
     fi
 
     echo ""
