@@ -166,4 +166,51 @@
    <filename>OUTPUTDIR/vehicle_processor.csv</filename>
   </csvConfig>
  </outputConfig>
+<outputConfig>
+  <type>csv</type>
+  <requiredData>
+   <id>"scm":2:12:0</id>
+   <id>"scm":2:12:1</id>
+   <id>"scm":2:12:2</id>
+   <id>"scm":2:12:3</id>
+   <id>"scm":2:12:4</id>
+   <id>"scm":2:12:5</id>
+   <id>"scm":2:12:6</id>
+   <id>"scm":2:12:7</id>
+  </requiredData>
+  <csvConfig>
+   <timeFormat>absolute</timeFormat>
+   <enumFormat>numeric</enumFormat>
+   <signSuffix>disable</signSuffix>
+   <columnHeaders>enable</columnHeaders>
+   <filename>OUTPUTDIR/vs_remotecontrol.csv</filename>
+  </csvConfig>
+</outputConfig>
+<outputConfig>
+  <type>csv</type>
+  <requiredData>
+   <id>"scm":2:4:"name"</id>
+   <id>"scm":2:4:"message"</id>
+   <id>"scm":2:4:"state"</id>
+   <id>"scm":2:3:"name"</id>
+   <id>"scm":2:3:"message"</id>
+   <id>"scm":3:4:"name"</id>
+   <id>"scm":3:4:"message"</id>
+   <id>"scm":3:4:"state"</id>
+   <id>"scm":3:3:"name"</id>
+   <id>"scm":3:3:"message"</id>
+   <id>"scm":4:4:"name"</id>
+   <id>"scm":4:4:"message"</id>
+   <id>"scm":4:4:"state"</id>
+   <id>"scm":4:3:"name"</id>
+   <id>"scm":4:3:"message"</id>
+  </requiredData>
+  <csvConfig>
+   <timeFormat>absolute</timeFormat>
+   <enumFormat>numeric</enumFormat>
+   <signSuffix>disable</signSuffix>
+   <columnHeaders>enable</columnHeaders>
+   <filename>OUTPUTDIR/alarms.csv</filename>
+  </csvConfig>
+ </outputConfig>
 </outputs>

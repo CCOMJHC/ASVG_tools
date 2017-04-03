@@ -15,6 +15,11 @@ else
 	exit
 fi
 
+function asv_exec {
+    echo "      Executing:   $1"
+    eval "$1"
+}
+
 DOCW4=0
 DOCSV=0
 DO2000=0
@@ -225,32 +230,19 @@ for datadir in ${datadirs[@]}; do
 	fi
 
     # Capture where the command was executed from.
-    cwd=`pwd`
+    CWD=`pwd`
 
     if [ "$DOCW4" == 1 ]; then
-	# A bug in data-export-cli utility will not support multiple
-	# exports in a single file. So separate export configuration files
-	# had to be generated for each. This line hails from a time when
-	# we expected to be able to do it in a single go.
-	#cd "$complete_outputdir/configs"
 	echo "Extracting ASV C-Worker Binary Logs..."
 	echo "   Creating export configuration..."
-	${ASVG_TOOLS}/bash/create_export_config.sh "$complete_outputdir" > "$outputspec"
-	echo "$outputspec"
-	# Go to the output directory and create the config files.
-	#cd $complete_outputdir
-
-	pwd
+	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
+	asv_exec "${CMD}"
 
 	# Then find all the config files we generated and process each.
 	echo "   Processing $datadir..."
-	echo "   /usr/local/bin/data-export-cli -d \""${ccscm}/scm-vp/${datadir}"\" \
-     	    -x \""${outputspec}"\" 2>&1 >> \""${complete_outputdir}/export.log\"""
+	CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/${datadir} -x ${outputspec} >> ${complete_outputdir}/export.log 2>&1"
+	asv_exec "${CMD}"
 
-	#/usr/local/bin/data-export-cli -d \""${ccscm}/scm-vp/${datadir}"\" \
-     	#    -x \""${outputspec}"\" 2>&1 >> \""${complete_outputdir}/export.log\""
-
-	/usr/local/bin/data-export-cli -d "${ccscm}/scm-vp/${datadir}" -x "${outputspec}"
 
 	# In this block, separate processes were launched for each export
 	# and these were monitored for completion.
@@ -283,9 +275,11 @@ for datadir in ${datadirs[@]}; do
 	echo ""
 	echo "   Parsing CSV files for MATLAB."
 	if [ "$DOCW4" == 1 ]; then
-	    ${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \""${complete_outputdir}"\" -o i -vv
+	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${complete_outputdir}\" -o i -vv"
+	    asv_exec "${CMD}"
 	else
-	    ${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \""${ccscm}/${datadir}"\" -o \""${outputdir}/${datadir}"\" -vv
+	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${ccscm}/${datadir}\" -o \"${outputdir}/${datadir}\" -vv"
+	    asv_exec "${CMD}"
 	fi
 	echo ""
     fi
@@ -293,18 +287,20 @@ for datadir in ${datadirs[@]}; do
     if [ "$DO0183" = 1 ]; then
 	echo ""
 	echo "   Parsing nmea0183 logs..."
-	${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \""${ccscm}/scm-vp/${datadir}"\" -o \""${complete_outputdir}"\"
+	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \"${ccscm}/scm-vp/${datadir}\" -o \"${complete_outputdir}\""
+	asv_exec "${CMD}"
 	echo ""
     fi
 
     if [ "$DO2000" = 1 ]; then
 	echo "Parsing nmea2000 logs..."
-	${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d "${ccscm}/scm-vp/${datadir}" -o "${complete_outputdir}"
+	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d ${ccscm}/scm-vp/${datadir} -o ${complete_outputdir}"
+	asv_exec "${CMD}"
     fi
 
     echo ""
     echo "Export of $datadir complete."
     # Go back to the original location.
-    cd "$cwd"
+    cd "${CWD}"
 
 done

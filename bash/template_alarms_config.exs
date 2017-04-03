@@ -1,0 +1,24 @@
+<outputs>
+ <outputConfig>
+  <type>csv</type>
+  <requiredData>
+   <id>"scm":3:4:"name"</id>
+   <id>"scm":3:4:"message"</id>
+   <id>"scm":3:4:"state"</id>
+   <id>"scm":3:3:"name"</id>
+   <id>"scm":3:3:"message"</id>
+   <id>"scm":4:4:"name"</id>
+   <id>"scm":4:4:"message"</id>
+   <id>"scm":4:4:"state"</id>
+   <id>"scm":4:3:"name"</id>
+   <id>"scm":4:3:"message"</id>
+  </requiredData>
+  <csvConfig>
+   <timeFormat>absolute</timeFormat>
+   <enumFormat>both</enumFormat>
+   <signSuffix>disable</signSuffix>
+   <columnHeaders>enable</columnHeaders>
+   <filename>/home/unmanned/2016_SAT/2016-09-14_AlarmsEvents.csv</filename>
+  </csvConfig>
+ </outputConfig>
+</outputs>
