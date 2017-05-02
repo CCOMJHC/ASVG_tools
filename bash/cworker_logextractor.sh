@@ -104,7 +104,6 @@ if [ "$PRINTHELP" == 1 ]; then
     exit 1
 fi
 
-
 if [ "$outputdir" == "" ]; then
     echo "You must specify an output directory (-o <path>)." >&2
     exit 1
