@@ -4,7 +4,10 @@
 Created on Tue Oct  4 06:24:47 2016
 
 @author: vschmidt
+
+REQUIRES unix commands cat and strings.
 """
+
 
 import _mypath
 import os
@@ -46,9 +49,13 @@ gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser/gpsparser.py')
 # Note the grep removes non-ASCII characters, which come with the AIS logs.
 for logtype in GPStypestoparse:
     cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*nmea0183') 
-           + ' | perl -pe \'s/[^[:ascii:]]//g\' | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
+           + ' | strings | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
            os.path.join(outputdir,logtype + '.txt'))
-    #cmd = (gpsparser + 
+    #cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*nmea0183') 
+    #       + ' | perl -pe \'s/[^[:ascii:]]//g\' | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
+    #       os.path.join(outputdir,logtype + '.txt'))
+  
+   #cmd = (gpsparser + 
     #       ' -g ' + os.path.join(directory,'device') + '::nmea0183' +
     #' -s ' + logtype + ' -o ' + outputdir)
    
