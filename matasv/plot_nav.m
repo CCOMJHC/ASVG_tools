@@ -13,7 +13,8 @@ end
 defaultfontsize = get(0,'DefaultAxesFontSize');
 set(0,'DefaultAxesFontSize',10)
 
-[pos, vtg, rmc, att, hdg, engine, pilot, vehiclestate, vehicle] = load_CW4_data(directory);
+[pos, vtg, rmc, att, hdg, engine, pilot, vehiclestate, vehicle] = ...
+    load_CW4_data(directory);
 
 
 %%

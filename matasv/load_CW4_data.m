@@ -1,5 +1,13 @@
 function [pos, vtg, rmc, att, hdg, engine, pilot, vehiclestate, vehicle] = load_CW4_data(directory)
 %% A function to load all parsed data from a CW4 extracted_logs directory.
+%
+% [pos, vtg, rmc, att, hdg,...
+%   engine, pilot, vehiclestate, vehicle] = load_CW4_data([directory])
+%
+% 
+if isempty(directory)
+   directory = uigetdir(); 
+end
 
 [pathstr, dirstr, suf] = fileparts(directory);
 
