@@ -223,10 +223,8 @@ for datadir in ${datadirs[@]}; do
     # Define and create the output directory.
     complete_outputdir="${outputdir}/extracted_logs/${datadir}"
     outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
-    if [ "$DOCW4" = "1" ]; then
-	echo "mkdir $complete_outputdir"
-	mkdir -p "$complete_outputdir/configs/"
-	fi
+    echo "mkdir $complete_outputdir"
+    mkdir -p "$complete_outputdir/configs/"
 
     # Capture where the command was executed from.
     CWD=`pwd`
