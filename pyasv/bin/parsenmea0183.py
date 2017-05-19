@@ -67,7 +67,7 @@ for device in devices_to_parse:
     for logtype in GPStypestoparse:
         cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*' + device + '.nmea0183') 
                + ' | strings | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
-               os.path.join(outputdir,logtype + '.txt'))
+               os.path.join(outputdir,logtype + '_' + device + '_.txt'))
                #cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*nmea0183') 
                #       + ' | perl -pe \'s/[^[:ascii:]]//g\' | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
                #       os.path.join(outputdir,logtype + '.txt'))
