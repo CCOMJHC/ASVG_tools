@@ -4,7 +4,6 @@
 
 import sys
 import requests
-import xml.etree.ElementTree as et
 from bs4 import BeautifulSoup
 import time
 import datetime 
@@ -26,6 +25,9 @@ class circuit():
 	def print_data(self):
 		print("%s,%s,%s,%s,%s,%s" % (datetime.datetime.fromtimestamp(self.updatetime).isoformat(),self.updatetime,self.cktname,self.status,self.voltage,self.current))
 
+	def print_log(self,logfile):
+		logfile.write("%s,%s,%s,%s,%s,%s\n" % (datetime.datetime.fromtimestamp(self.updatetime).isoformat(),self.updatetime,self.cktname,self.status,self.voltage,self.current))
+		
 class west_mountain_radio():
 
 	def __init__(self,ip_address):
@@ -72,14 +74,36 @@ class west_mountain_radio():
 		for c in self.circuits:
 			c.print_data()
 
+	def print_log(self,logfile):
+		for c in self.circuits:
+			c.print_log(logfile)	
+
 if __name__ == '__main__':
 
 	if sys.argv[1] == '-h':
 		print "Usage:"
 		print "  ./west_mountain_radio 192.168.100.224"
 		sys.exit()
-
-	wmr = west_mountain_radio(sys.argv[1])
-	wmr.get_names()
-	wmr.get_status()
-	wmr.print_status()
+	if sys.argv[1] == 'log':
+		iso = datetime.datetime.utcnow().isoformat().replace(':','-')
+		with open('west_mountain_radio_log_' + iso + '.txt','w') as logfile:
+			
+			while True:
+				# FIX THIS		
+				wmr12 = west_mountain_radio('192.168.100.212')
+				wmr24 = west_mountain_radio('192.168.100.224')
+				wmr24.get_names()
+				wmr24.get_status()
+				wmr24.print_status()
+				wmr24.print_log(logfile)
+				wmr12.get_names()
+				wmr12.get_status()
+				wmr12.print_status()
+				wmr12.print_log(logfile)
+				time.sleep(1)		
+	
+	else:
+		wmr = west_mountain_radio(sys.argv[1])
+		wmr.get_names()
+		wmr.get_status()
+		wmr.print_status()
