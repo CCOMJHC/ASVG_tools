@@ -55,6 +55,6 @@ if __name__ == '__main__':
     
     try: 
         publisher()
-    except: rospy.ROSInterruptException
+    except rospy.ROSInterruptException:
         pass
     
