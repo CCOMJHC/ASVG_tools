@@ -25,11 +25,13 @@ def publisher():
         for c in circuits:
             C = circuit.circuit
             #C.Header.timestamp = rospy.get_time()
+            C.Header.stamp.secs = int(c.updatetime)
+            C.Header.stamp.nsecs = c.updatetime - int(c.updatetime)
             C.name = c.cktnmae
             C.status = c.status == 1
             C.voltage= float(c.voltage)
-            C.current = (float(c.current)
-            
+            C.current = float(c.current)
+            rospy.loginfo(C)
             pub.publish(circuit)
 
         rate.sleep()        
