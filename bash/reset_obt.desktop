@@ -2,7 +2,7 @@
 Version=1.0
 Name=Emergency Reset OBT
 Comment=Script Emergency Reset OBT
-Exec=/home/unmanned/gitsrc/ASVG_tools/bash/reset_obt.sh
+Exec=/usr/bin/gnome-terminal -x /home/unmanned/gitsrc/ASVG_tools/bash/reset_obt.sh
 Icon=/home/unmanned/gitsrc/ASVG_tools/bash/reset_obt_icon.png
 Terminal=false
 Type=Application

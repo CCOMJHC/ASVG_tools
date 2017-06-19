@@ -5,8 +5,11 @@
 # Val Schmidt
 # CCOM/JHC
 
-echo -e ""
-echo -e "RESETTING VS. PLEASE ENTER UNMANNED PASSWORD (UNMANNED:"
-ssh -t unmanned@vsc 'sudo systemctl restart scm-vs'
+echo ""
+echo -e "RESETTING VS. PLEASE ENTER UNMANNED PASSWORD (unmanned):"
+ssh -t unmanned@vsc sudo systemctl restart scm-vs
 echo -e ""
 echo -e "RESET COMPLETE. NOW PLEASE RECONNECT ASVIEW-BRIDGE"
+echo -e "Return to exit."
+read a
+
