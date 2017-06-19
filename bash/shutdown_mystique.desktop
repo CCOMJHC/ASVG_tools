@@ -2,7 +2,7 @@
 Version=1.0
 Name=ShutdownMystique
 Comment=Script to Shutdown Mystique Linux PC
-Exec=/home/unmanned/gitsrc/ASVG_tools/bash/shutdown_mystique.sh
+Exec=/usr/bin/gnome-terminal -x /home/unmanned/gitsrc/ASVG_tools/bash/shutdown_mystique.sh
 Icon=/home/unmanned/gitsrc/ASVG_tools/bash/shutdown_icon.png
 Terminal=false
 Type=Application
