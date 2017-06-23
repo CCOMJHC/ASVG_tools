@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import time
 import json
 import datetime
+import scipy as sci
 
 data_items = (
         ('snr 7',('remoteStatus',7,'demodStatus','snr',8)),
@@ -36,20 +37,32 @@ datasets = {}
 for di in data_items:
     datasets[di[0]]=[]
 
+BADLINE = False
+
 for l in infile.readlines():
     if newline:
-        ts,l = l.split(',',1)
-        ts = datetime.datetime.strptime(ts,"%Y-%m-%dT%H:%M:%S.%f")
-        newline = False
-    if len(l.strip()) == 0:
-        data = json.loads(jsonbuffer)
-        times.append(ts)
-        for di in data_items:
-            datasets[di[0]].append(getItem(data,di[1]))
-        newline = True
-        jsonbuffer = ''
-    else:
-        jsonbuffer += l
+	try:
+            ts,l = l.split(',',1)
+            ts = datetime.datetime.strptime(ts,"%Y-%m-%dT%H:%M:%S.%f")
+
+            newline = False
+        except:
+            print("ERROR: %s" % l)
+            BADLINE = True
+    if not BADLINE:
+        if len(l.strip()) == 0:
+            data = json.loads(jsonbuffer)
+            times.append(ts)
+            for di in data_items:
+                try:
+                    datasets[di[0]].append(getItem(data,di[1]))
+                except:
+	            datasets[di[0]].append(sci.nan)
+
+            newline = True
+            jsonbuffer = ''
+        else:
+            jsonbuffer += l
 
 for di in data_items:
     plt.plot(times,datasets[di[0]],label=di[0])
