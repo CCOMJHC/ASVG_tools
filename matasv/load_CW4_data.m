@@ -12,8 +12,11 @@ end
 [pathstr, dirstr, suf] = fileparts(directory);
 
 disp('Loading GGA')
+    
 if exist([directory filesep 'GGA.txt'],'file')
     pos = load([directory filesep 'GGA.txt']);
+elseif exist([directory filesep 'GGA_3_.txt'],'file')
+    pos = load([directory filesep 'GGA_3_.txt']);
 else
     disp('Unable to find GGA.txt')
     pos = [];
@@ -21,6 +24,8 @@ end
 disp('Loading VTG')
 if exist([directory filesep 'VTG.txt'],'file')
     vtg = load([directory filesep 'VTG.txt']);
+elseif exist([directory filesep 'VTG_3_.txt'],'file')
+    vtg = load([directory filesep 'VTG_3_.txt']);
 else
     disp('Unable to find VTG.txt')
     vtg = [];
@@ -28,6 +33,8 @@ end
 disp('loading RMC')
 if exist([directory filesep 'RMC.txt'],'file')
     rmc = load([directory filesep 'RMC.txt']);
+elseif exist([directory filesep 'RMC_3_.txt'],'file')
+    rmc = load([directory filesep 'RMC_3_.txt'],'file');
 else
     disp('Unable to find RMC.txt')
     rmc = [];
