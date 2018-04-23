@@ -214,11 +214,45 @@ if [ "$DOCW4" == 1 ]; then
     fi
 fi
 
-
-# Process the data. 
+# Extract the data from ASV Global Log files in parallel fashion.
 for datadir in ${datadirs[@]}; do
+    # Define and create the output directory.
+    complete_outputdir="${outputdir}/extracted_logs/${datadir}"
+    outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
+    echo "mkdir $complete_outputdir"
+    mkdir -p "$complete_outputdir/configs/"
+    # Capture where the command was executed from.
+    CWD=`pwd`
+
+    if [ "$DOCW4" == 1 ]; then
+	echo "Extracting ASV C-Worker Binary Logs..."
+	echo "Creating export configuration..."
+	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
+	asv_exec "${CMD}"
+
+	# Then find all the config files we generated and process each.
+	echo "Extracting data from $datadir..."
+	CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/${datadir} -x ${outputspec} >> ${complete_outputdir}/export.log 2>&1 &"
+	asv_exec "${CMD}"
+    fi
+
+done
+
+# Monitor these extractions. 
+secs=0
+procs=`jobs | grep Running`
+echo ""
+while [ "$procs" != "" ]; do
+	echo "Processing $datadir, ${secs}s elapsed..."
+ 	sleep 1
+ 	secs=`echo "$secs+1" | bc`
+ 	tput cuu 1
+ 	procs=`jobs | grep Running`
+done
 
 
+# Parse the data. 
+for datadir in ${datadirs[@]}; do
 
     # Define and create the output directory.
     complete_outputdir="${outputdir}/extracted_logs/${datadir}"
@@ -229,48 +263,12 @@ for datadir in ${datadirs[@]}; do
     # Capture where the command was executed from.
     CWD=`pwd`
 
-    if [ "$DOCW4" == 1 ]; then
-	echo "Extracting ASV C-Worker Binary Logs..."
-	echo "   Creating export configuration..."
-	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
-	asv_exec "${CMD}"
-
-	# Then find all the config files we generated and process each.
-	echo "   Processing $datadir..."
-	CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/${datadir} -x ${outputspec} >> ${complete_outputdir}/export.log 2>&1"
-	asv_exec "${CMD}"
-
-
-	# In this block, separate processes were launched for each export
-	# and these were monitored for completion.
-	# This was useful when running separate exports was required.
-	# It no longer is, so we run just the ingle line above.
-	# configstoprocess=`find . -type f | grep export_config.exs`
-	# for config in ${configstoprocess[@]}; do
-	# 	echo "Processing $config"
-	# 	data-export-cli -d "$ccscm/scm-vp/$datadir" \
-	# 	    -x "$config" 2>&1 >> $complete_outputdir/export.log &
-	# done
-	#
-	# secs=0
-	# procs=`jobs | grep Running`
-	# while [ "$procs" != "" ]; do
-	#
-	# 	echo "Processing $datadir, ${secs}s elapsed..."
-	# 	sleep 1
-	# 	secs=`echo "$secs+1" | bc`
-	# 	tput cuu 1
-	# 	procs=`jobs | grep Running`
-
-	# done
-
-    fi
     # Note the escaped quotes in these lines help the code handle spaces in a file or directory name.
     # These have to be stripped off however inside the python code.
 
     if [ "$DOCSV" == 1 ]; then
 	echo ""
-	echo "   Parsing CSV files for MATLAB."
+	echo "Parsing CSV files for MATLAB."
 	if [ "$DOCW4" == 1 ]; then
 	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${complete_outputdir}\" -o i -vv"
 	    asv_exec "${CMD}"
@@ -283,7 +281,7 @@ for datadir in ${datadirs[@]}; do
 
     if [ "$DO0183" = 1 ]; then
 	echo ""
-	echo "   Parsing nmea0183 logs..."
+	echo "Parsing nmea0183 logs..."
 	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \"${ccscm}/scm-vp/${datadir}\" -o \"${complete_outputdir}\""
 	asv_exec "${CMD}"
 	echo ""
