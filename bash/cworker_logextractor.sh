@@ -16,7 +16,9 @@ else
 fi
 
 function asv_exec {
-    echo "      Executing:   $1"
+    if [ "$2" == 1]; then
+	echo "      Executing:   $1"
+    done
     eval "$1"
 }
 
@@ -26,8 +28,9 @@ DO2000=0
 DO0183=0
 PRINTHELP=0
 GOTOUTPUT=0
+VERBOSE=0
 
-while getopts ":rewqhad:o:" opt; do
+while getopts ":rewqhad:o:v" opt; do
 
     case $opt in 
 	r) 
@@ -57,6 +60,9 @@ while getopts ":rewqhad:o:" opt; do
 	    DOCSV=1
 	    DO2000=1
 	    DO0183=1
+	    ;;
+	v)
+	    VERBOSE=1
 	    ;;
 	\?)
 	    echo "Invalid option: $OPTARG" >&2
@@ -212,7 +218,9 @@ if [ "$DOCW4" == 1 ]; then
 	echo "Unable to find the data export tool: data-export-cli"
 	exit
     fi
+	echo "Extracting ASV C-Worker Binary Logs..."
 fi
+
 
 # Extract the data from ASV Global Log files in parallel fashion.
 for datadir in ${datadirs[@]}; do
@@ -225,15 +233,14 @@ for datadir in ${datadirs[@]}; do
     CWD=`pwd`
 
     if [ "$DOCW4" == 1 ]; then
-	echo "Extracting ASV C-Worker Binary Logs..."
 	echo "Creating export configuration..."
 	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
-	asv_exec "${CMD}"
+	asv_exec "${CMD}" "${VERBOSE}"
 
 	# Then find all the config files we generated and process each.
 	echo "Extracting data from $datadir..."
 	CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/${datadir} -x ${outputspec} >> ${complete_outputdir}/export.log 2>&1 &"
-	asv_exec "${CMD}"
+	asv_exec "${CMD}" "${VERBOSE}"
     fi
 
 done
@@ -271,10 +278,10 @@ for datadir in ${datadirs[@]}; do
 	echo "Parsing CSV files for MATLAB."
 	if [ "$DOCW4" == 1 ]; then
 	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${complete_outputdir}\" -o i -vv"
-	    asv_exec "${CMD}"
+	    asv_exec "${CMD}" "${VERBOSE}"
 	else
 	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${ccscm}/${datadir}\" -o \"${outputdir}/${datadir}\" -vv"
-	    asv_exec "${CMD}"
+	    asv_exec "${CMD}" "${VERBOSE}"
 	fi
 	echo ""
     fi
@@ -283,14 +290,14 @@ for datadir in ${datadirs[@]}; do
 	echo ""
 	echo "Parsing nmea0183 logs..."
 	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \"${ccscm}/scm-vp/${datadir}\" -o \"${complete_outputdir}\""
-	asv_exec "${CMD}"
+	asv_exec "${CMD}" "${VERBOSE}"
 	echo ""
     fi
 
     if [ "$DO2000" = 1 ]; then
 	echo "Parsing nmea2000 logs..."
 	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d ${ccscm}/scm-vp/${datadir} -o ${complete_outputdir}"
-	asv_exec "${CMD}"
+	asv_exec "${CMD}" "${VERBOSE}"
     fi
 
     echo ""

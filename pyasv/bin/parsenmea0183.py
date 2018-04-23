@@ -57,7 +57,7 @@ else:
     
 
 thisdir = os.path.dirname(__file__)
-gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser/gpsparser.py')
+gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser.py')
 
 # Specify the output directory name.
 # Default is the cwd ('./'). -i gives the input directory. 
