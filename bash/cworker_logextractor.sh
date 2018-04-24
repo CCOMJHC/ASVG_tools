@@ -21,6 +21,7 @@ function asv_exec {
     fi
     eval "$1"
 }
+export -f asv_exec
 
 DOCW4=0
 DOCSV=0
@@ -56,7 +57,8 @@ while getopts ":rewqhad:o:v" opt; do
 	    PRINTHELP=1
 	    ;;
 	a) 
-	    DOCW4=1
+	    DOCW4=12018-04-20T16-46-48
+2018-04-20T19-49-23
 	    DOCSV=1
 	    DO2000=1
 	    DO0183=1
@@ -81,8 +83,14 @@ echo $DOCSV
 echo $DO2000
 echo $DO0183
 echo $PRINTHELP
+echo $VERBOSE
 echo $ccscm
 echo $outputdir
+
+# Exporting these to make them globally accessible. 
+# probably not good bash programming practice.
+export ccscm
+export VERBOSE
 
 
 if [ "$PRINTHELP" == 1 ]; then
@@ -96,7 +104,8 @@ if [ "$PRINTHELP" == 1 ]; then
     echo "  -e parses the CSV files, modifies the parameters names and produces .mat files. (calls parsecsv.py)"
     echo "     NOTE: If -e is called without -r, it is assumed that the CW4 files are already parsed. "
     echo "           In this case, the argument to -d should be /path/to/extracted_logs/"
-    echo "           and -o should probably be the same to put the results in the same directory."
+    echo "           and -o should probably2018-04-20T16-46-48
+2018-04-20T19-49-23 be the same to put the results in the same directory."
     echo "  -w extracts data from the nmea2000 log files. (calls parsenmea2000.py)"
     echo "  -q extracts data from the nmea1830 log files. (calls parsenmea0183.py, which in turn calls gpsparser.py)"
     echo "  -a does all of these. "
@@ -219,43 +228,60 @@ if [ "$DOCW4" == 1 ]; then
 	exit
     fi
 	echo "Extracting ASV C-Worker Binary Logs..."
+        echo "Creating export configuration..."
 fi
 
+complete_outputdirs=()
+outputspecs=()
 
-# Extract the data from ASV Global Log files in parallel fashion.
+
+# Create lists of the output directory and config script names
 for datadir in ${datadirs[@]}; do
     # Define and create the output directory.
     complete_outputdir="${outputdir}/extracted_logs/${datadir}"
     outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
     echo "mkdir $complete_outputdir"
     mkdir -p "$complete_outputdir/configs/"
-    # Capture where the command was executed from.
-    CWD=`pwd`
+
+    # Capture a list of these for parallel execution later.
+    complete_outputdirs=( "${complete_outputdirs[@]}" ${complete_outputdir} )
+    outputspecs=( "${outputspecs[@]}" ${outputspec} )
 
     if [ "$DOCW4" == 1 ]; then
-	echo "Creating export configuration..."
+	
 	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
-	asv_exec "${CMD}" "${VERBOSE}"
-
-	# Then find all the config files we generated and process each.
-	echo "Extracting data from $datadir..."
-	CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/${datadir} -x ${outputspec} >> ${complete_outputdir}/export.log 2>&1 &"
 	asv_exec "${CMD}" "${VERBOSE}"
     fi
 
 done
 
-# Monitor these extractions. 
-secs=0
-procs=`jobs | grep Running`
-echo ""
-while [ "$procs" != "" ]; do
-	echo "Processing $datadir, ${secs}s elapsed..."
- 	sleep 1
- 	secs=`echo "$secs+1" | bc`
- 	tput cuu 1
- 	procs=`jobs | grep Running`
-done
+#for x in `seq 0 1`; do
+#echo "${datadirs[$x]}, ${complete_outputdirs[$x]}, ${outputspecs[$x]}"
+#done
+#exit
+
+# Capture where the command was executed from.
+CWD=`pwd`
+
+function extract_data() {
+
+	# The original command before we made this parallel:
+	# CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/${datadir} -x ${outputspec} >> ${complete_outputdir}/export.log 2>&1 &"
+	CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/$1 -x $2 >> $3/export.log 2>&1"
+	asv_exec "${CMD}" "${VERBOSE}"
+
+}
+export -f extract_data
+# Execute the data extraction in parallel, being careful about memory.
+# and not exceeding the number of cores.
+if [ "$DOCW4" == 1 ]; then
+	echo "Launching data export processes..."
+	if [ "$VERBOSE" == 1 ]; then
+	    parallel -v --xapply --load 90% --noswap --jobs 0 --joblog - extract_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
+        else
+	    parallel --xapply --load 90% --noswap --jobs 0 --joblog - extract_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
+        fi
+fi
 
 
 # Parse the data. 
@@ -264,11 +290,11 @@ for datadir in ${datadirs[@]}; do
     # Define and create the output directory.
     complete_outputdir="${outputdir}/extracted_logs/${datadir}"
     outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
-    echo "mkdir $complete_outputdir"
-    mkdir -p "$complete_outputdir/configs/"
-
-    # Capture where the command was executed from.
-    CWD=`pwd`
+    # If we extracted CW4 logs, then we made these directories already, so omit this.
+    if [ "$DOCW4" == 0 ]; then
+        echo "mkdir $complete_outputdir"
+        mkdir -p "$complete_outputdir/configs/"
+    fi
 
     # Note the escaped quotes in these lines help the code handle spaces in a file or directory name.
     # These have to be stripped off however inside the python code.
