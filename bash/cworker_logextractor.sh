@@ -16,9 +16,9 @@ else
 fi
 
 function asv_exec {
-    if [ "$2" == 1]; then
+    if [ "$2" == 1 ]; then
 	echo "      Executing:   $1"
-    done
+    fi
     eval "$1"
 }
 
