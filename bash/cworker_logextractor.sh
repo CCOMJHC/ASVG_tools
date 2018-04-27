@@ -57,8 +57,7 @@ while getopts ":rewqhad:o:v" opt; do
 	    PRINTHELP=1
 	    ;;
 	a) 
-	    DOCW4=12018-04-20T16-46-48
-2018-04-20T19-49-23
+	    DOCW4=1
 	    DOCSV=1
 	    DO2000=1
 	    DO0183=1
@@ -78,14 +77,16 @@ while getopts ":rewqhad:o:v" opt; do
 
 done
 
-echo $DOCW4
-echo $DOCSV
-echo $DO2000
-echo $DO0183
-echo $PRINTHELP
-echo $VERBOSE
-echo $ccscm
-echo $outputdir
+if [ "$VERBOSE" == 1 ]; then
+echo "DO CW4: $DOCW4"
+echo "DO CSV: $DOCSV"
+echo "DO N2K: $DO2000"
+echo "DO N18: $DO0183"
+echo "DO HEL: $PRINTHELP"
+echo "VERBOS: $VERBOSE"
+echo "IN DIR: $ccscm"
+echo "OU DIR: $outputdir"
+fi
 
 # Exporting these to make them globally accessible. 
 # probably not good bash programming practice.
@@ -104,8 +105,7 @@ if [ "$PRINTHELP" == 1 ]; then
     echo "  -e parses the CSV files, modifies the parameters names and produces .mat files. (calls parsecsv.py)"
     echo "     NOTE: If -e is called without -r, it is assumed that the CW4 files are already parsed. "
     echo "           In this case, the argument to -d should be /path/to/extracted_logs/"
-    echo "           and -o should probably2018-04-20T16-46-48
-2018-04-20T19-49-23 be the same to put the results in the same directory."
+    echo "           and -o should probably2018-04-20T16-46-be the same to put the results in the same directory."
     echo "  -w extracts data from the nmea2000 log files. (calls parsenmea2000.py)"
     echo "  -q extracts data from the nmea1830 log files. (calls parsenmea0183.py, which in turn calls gpsparser.py)"
     echo "  -a does all of these. "
@@ -119,10 +119,44 @@ if [ "$PRINTHELP" == 1 ]; then
     exit 1
 fi
 
-if [ "$outputdir" == "" ]; then
+# The first argument is the path to the ccscm log directory. 
+#ccscm=$1
+
+if [ ! -e "$ccscm" ]; then
+    echo "Could not find $ccscm"
+    echo "Exiting..."
+    exit 
+fi 
+
+# We need to specify an output directory, unless we are parsing CSV files. These
+# files are generated when we extract the logs using the ASV Global command line tool,
+# hence the output directory must have already been created. So this case is handled below
+if [[ "$outputdir" == "" ]] && [[ "$DO2000" == 1 || "$DOCW4" == 1 || "$DO1083" == 1 ]]; then
     echo "You must specify an output directory (-o <path>)." >&2
     exit 1
 fi
+
+# If we are asking to parse the CSV files generated from extracting data from the CW4
+# and that is all, then $ccscm will either be the path to extracted_logs, or possibly the
+# directory above it. Code below expects the directory above it so handle that here. 
+if [[ "$outputdir" == "" ]] && [[ "$DOCW4" == 0 && "$DOCSV" == 1 ]]; then
+
+    if [ `basename $ccscm` == "extracted_logs" ]; then
+       outputdir=`dirname "$ccscm"`
+    elif [ ! -d $ccscm/extracted_logs ]; then
+       echo "Cannot find the extract_logs/ directory from which to read data. Exiting."
+       exit
+    else
+       outputdir="$ccscm"
+    fi
+fi
+
+outputdir=`realpath "$outputdir"`
+if [ "$VERBOSE" == 1 ]; then
+echo "Revised OUT DIR: $outputdir"
+fi
+echo ""
+
 
 # An environment varialbe we'll eventually set.
 #ASVG_TOOLS="/home/asvuser/gitsrc/ASVG_tools/"
@@ -133,14 +167,7 @@ if [ "$ASVG_TOOLS" = "" ]; then
     exit 1
 fi
 
-# The first argument is the path to the ccscm log directory. 
-#ccscm=$1
 
-if [ ! -e "$ccscm" ]; then
-    echo "Could not find $ccscm"
-    echo "Exiting..."
-    exit 
-fi 
 
 
 #ccscm=`readlink -f "$ccscm"`
@@ -155,7 +182,6 @@ fi
 #    echo "    $tmp/extracted_logs"
 #fi
 #outputdir="$tmp/extracted_logs/"
-outputdir=`realpath "$outputdir"`
 
 # TODO: Check to see that the output directory exist and either fail
 # or make it.   
@@ -167,7 +193,7 @@ outputdir=`realpath "$outputdir"`
 # In this case we have presumably already extracted CSV files,
 # we will have selected the "extract_logs" directory for input.
 if [ "$DOCSV" == "1" ] && [ "$DOCW4" == "0" ]; then
-    alllogdirs=`ls -1 ${ccscm}`
+    alllogdirs=`ls -1 ${ccscm}/extracted_logs`
 else
     alllogdirs=`ls -1 "${ccscm}/scm-vp"`
 fi
@@ -184,7 +210,7 @@ for logdir in ${alllogdirs[@]}; do
 	    echo "$logdir"
 	fi
     else
-	if [ -e "$ccscm/$logdir/engine.csv" ]; then
+	if [ -e "$ccscm/extracted_logs/$logdir/engine.csv" ]; then
 	    logswithdata=( ${logswithdata[@]} $logdir )
 	    echo "$logdir"
 	fi
@@ -272,6 +298,7 @@ function extract_data() {
 
 }
 export -f extract_data
+
 # Execute the data extraction in parallel, being careful about memory.
 # and not exceeding the number of cores.
 if [ "$DOCW4" == 1 ]; then
@@ -302,13 +329,13 @@ for datadir in ${datadirs[@]}; do
     if [ "$DOCSV" == 1 ]; then
 	echo ""
 	echo "Parsing CSV files for MATLAB."
-	if [ "$DOCW4" == 1 ]; then
+	#if [ "$DOCW4" == 1 ]; then
 	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${complete_outputdir}\" -o i -vv"
 	    asv_exec "${CMD}" "${VERBOSE}"
-	else
-	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${ccscm}/${datadir}\" -o \"${outputdir}/${datadir}\" -vv"
+	#else
+	#    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${ccscm}/${datadir}\" -o \"${outputdir}/${datadir}\" -vv"
 	    asv_exec "${CMD}" "${VERBOSE}"
-	fi
+	#fi
 	echo ""
     fi
 
