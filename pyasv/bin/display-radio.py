@@ -8,6 +8,8 @@ import time
 import json
 import datetime
 
+plotwindowhours = 6
+
 radio_url = 'http://unmanned:unmanned@192.168.100.51/status.json'
 
 data_items = (
@@ -39,14 +41,28 @@ while True:
     c = urllib.urlopen(radio_url)
     data = json.loads(c.read())
     now = datetime.datetime.utcnow()
+    plotwindowstart = now-datetime.timedelta(plotwindowhours/24.0)
+    plotwindowend = now + datetime.timedelta(1/24.0)
     if needsInit:
         for di in data_items:
-            plots[di[0]], = plt.plot([now,], [getItem(data,di[1]),],label=di[0])
-        plt.legend()
+            if di[0] == "snr 8" or di[0] == "snr 7":
+                datapoint = getItem(data,di[1])/10
+            else:
+                datapoint = getItem(data,di[1])
+            #plots[di[0]], = plt.plot([now,], [getItem(data,di[1]),],label=di[0])
+            plots[di[0]], = plt.plot([now,], [datapoint,],label=di[0])
+        plt.legend(loc='best')
         needsInit = False
     else:
         for di in data_items:
-            updatePlot(plots[di[0]], getItem(data,di[1]), now)
+            if di[0] == "snr 8" or di[0] == "snr 7":
+                datapoint = getItem(data,di[1])/10
+            else:
+                datapoint = getItem(data,di[1])
+            updatePlot(plots[di[0]], datapoint, now)
+
+    plt.axis([plotwindowstart, plotwindowend, -100, 50])
+    plt.grid(True)
     plt.pause(1.0)
 
 
