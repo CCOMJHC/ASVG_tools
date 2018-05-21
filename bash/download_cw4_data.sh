@@ -47,18 +47,14 @@ read dovs
 # Always do the vp
 dovp=y
 
-echo "Pull data over the CW4 Internal [1], Cobham [2] or Wifi [3] Networks?"
+echo "Pull data over the Cobham/Wired [1] or Wifi [2] Networks?"
 read network
 
 if [ "$network" == 1 ]; then
-	VP="192.168.10.10"
-fi
-
-if [ "$network" == 2 ]; then
 	VP="192.168.100.10"
 fi
 
-if [ "$network" == 3 ]; then
+if [ "$network" == 2 ]; then
 	VP="192.168.101.10"
 fi
 
