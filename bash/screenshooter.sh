@@ -17,7 +17,7 @@ INTERVAL=60
 clear
 # Create the log directory name for initial display
 DAY=$(date -u "+%Y-%m-%d")
-LOGDIR="/home/unmanned/data/other/screenshooter_${DAY}"
+LOGDIR=~/data/other/screenshooter_${DAY}
 
 # Display status
 echo "--- SCREENSHOOTER ACTIVE ---"
@@ -32,7 +32,7 @@ echo "OPTIONALLY, ENTER NEW INTERVAL: [RET]"
 while [ 1 ] ; do
     # Create the log directory
     DAY=$(date -u "+%Y-%m-%d")
-    LOGDIR="/home/unmanned/data/other/screenshooter_${DAY}"
+    LOGDIR=~/data/other/screenshooter_${DAY}
     if [ ! -e $LOGDIR ]; then
         mkdir -p $LOGDIR
     fi
