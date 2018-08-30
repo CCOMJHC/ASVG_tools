@@ -32,7 +32,7 @@ for i=1:length(files)
         datasetname = files(i).name(1:end-4);  % Capture the file name to use as the data set name
         eval([datasetname '= ASVLogReader(' apo indirectory filesep files(i).name apo ');'])
         
-        save([ outputdir datasetname '.mat'],datasetname)
+        save([ outputdir filesep datasetname '.mat'],datasetname)
     else
         continue
     end
