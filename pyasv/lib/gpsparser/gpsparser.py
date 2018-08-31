@@ -197,40 +197,40 @@ class GPSString(object):
                 self.handlegpstime(fields[1])                
                 self.handle_lat( fields[2], fields[3] )
                 self.handle_lon ( fields[4], fields[5] )
-                self.quality = dec.Decimal( fields[6] )
-                self.svs = dec.Decimal( fields[7] )
-                self.hdop = dec.Decimal( fields[8])
+                self.quality = float( fields[6] )
+                self.svs = float( fields[7] )
+                self.hdop = float( fields[8])
                 try:
-                    self.antennaheight = dec.Decimal(fields[9])
-                except dec.InvalidOperation:
+                    self.antennaheight = float(fields[9])
+                except:
                     if self.debug:
                         eprint("The field antennaheight may not be present.")
                         eprint("self.msg")
-                    self.antennaheight = dec.Decimal('NaN')
+                    self.antennaheight = float('NaN')
                 try:
-                    self.geoid = dec.Decimal(fields[11])
-                except dec.InvalidOperation:
+                    self.geoid = float(fields[11])
+                except: 
                     if self.debug:
                         eprint("The field GEOID Height may not be present.")
                         eprint(self.msg)
                         #print fields[11]
-                    self.geoid = dec.Decimal('NaN')
+                    self.geoid = float('NaN')
                 try:
-                    self.dgpsage = dec.Decimal(fields[13])
-                except dec.InvalidOperation:
+                    self.dgpsage = float(fields[13])
+                except: 
                     if self.debug: 
                         eprint("The field DGPS Age may not be present.")
                         eprint(self.msg)                        
                         #print fields[13]
-                    self.dgpspage = dec.Decimal('NaN')
+                    self.dgpspage = float('NaN')
                 try:
-                    self.stationid = dec.Decimal(fields[14] )
-                except dec.InvalidOperation:
+                    self.stationid = float(fields[14] )
+                except:
                     if self.debug: 
                         eprint("The field DGPS Station ID may not be present.")
                         eprint(self.msg)
                         #print 'StationID: %s' % fields[14]
-                    self.stationid = dec.Decimal('NaN')
+                    self.stationid = float('NaN')
                         
             else:
                 raise self.FailedParsing, 'Failed to parse %s' % self.msg
@@ -248,20 +248,20 @@ class GPSString(object):
                                                   int(fields[2]))
                 self.handlegpstime(fields[1])
                 try:
-                    self.tzoffsethours = dec.Decimal( fields[5] )
+                    self.tzoffsethours = float( fields[5] )
                 except dec.InvalidOperation:
                     if self.debug:
                         eprint("Thef ield Local TZ Offset Hours may not be present.")
                         eprint (fields[5])
-                    self.tzoffsethours = dec.Decimal('NaN')
+                    self.tzoffsethours = float('NaN')
 
                 try:
-                    self.tzoffsetminutes = dec.Decimal( fields[6] )
+                    self.tzoffsetminutes = float( fields[6] )
                 except dec.InvalidOperation:
                     if self.debug: 
                         eprint("The field Local TZ Offset Minutes may not be present.")
                         eprint(fields[6])
-                    self.tzoffsetminutes = dec.Decimal('NaN')
+                    self.tzoffsetminutes = float('NaN')
             else:
                 raise self.FailedParsing, 'Failed to parse %s' % self.msg
  
@@ -306,13 +306,13 @@ class GPSString(object):
                 fields = gps_extract.split(',')
                 'Handle GST Fields'
                 self.handlegpstime(fields[1])
-                self.residualrms = dec.Decimal(fields[2])
-                self.semimajor = dec.Decimal(fields[3])
-                self.semiminor = dec.Decimal(fields[4])
-                self.orientation = dec.Decimal(fields[5])
-                self.lat1sigma = dec.Decimal(fields[6])
-                self.lon1sigma = dec.Decimal(fields[7])
-                self.height1sigma = dec.Decimal(fields[8])
+                self.residualrms = float(fields[2])
+                self.semimajor = float(fields[3])
+                self.semiminor = float(fields[4])
+                self.orientation = float(fields[5])
+                self.lat1sigma = float(fields[6])
+                self.lon1sigma = float(fields[7])
+                self.height1sigma = float(fields[8])
             else:
                 raise self.FailedParsing, 'Failed to parse %s' % self.msg
  
@@ -324,9 +324,9 @@ class GPSString(object):
                 gps_extract = m.group('match')
                 fields = gps_extract.split(',')
                 'Handle GSV Fields'
-                self.messages = dec.Decimal( fields[1] )
-                self.messagenum = dec.Decimal ( fields[2] )
-                self.visibleSVs = dec.Decimal ( fields[3] )
+                self.messages = float( fields[1] )
+                self.messagenum = float ( fields[2] )
+                self.visibleSVs = float ( fields[3] )
                 self.PRN = []
                 self.elevation = []
                 self.azimuth = []
@@ -334,19 +334,19 @@ class GPSString(object):
                 if self.debug: 
                     eprint(fields)
                 for idx in range(4,fields.__len__() - 1, 4):
-                    self.PRN.append(dec.Decimal(fields[idx]))
-                    self.elevation.append(dec.Decimal(fields[idx + 1]))
+                    self.PRN.append(float(fields[idx]))
+                    self.elevation.append(float(fields[idx + 1]))
                     try:
-                        self.azimuth.append(dec.Decimal(fields[idx + 2]))
+                        self.azimuth.append(float(fields[idx + 2]))
                     except dec.InvalidOperation:
-                        self.azimuth.append(dec.Decimal('NaN'))
+                        self.azimuth.append(float('NaN'))
                         eprint("The field Satellite Azimuth may be missing.")
                         eprint(fields[idx + 3])
                     try:
-                        self.snr.append(dec.Decimal(fields[idx + 3]))
+                        self.snr.append(float(fields[idx + 3]))
                     except dec.InvalidOperation:
                         # The spec says snr should be null when "not tracking"
-                        self.snr.append(dec.Decimal('NaN'))
+                        self.snr.append(float('NaN'))
             else:
                 raise self.FailedParsing, 'Failed to parse %s' % self.msg
  
@@ -358,9 +358,9 @@ class GPSString(object):
                 gps_extract = m.group('match')
                 fields = gps_extract.split(',')
                 'Handle VTG Fields'
-                self.cog = dec.Decimal(fields[1])
-                self.knots = dec.Decimal(fields[5])
-                self.kmph = dec.Decimal(fields[7])
+                self.cog = float(fields[1])
+                self.knots = float(fields[5])
+                self.kmph = float(fields[7])
             else:
                 raise self.FailedParsing, 'Failed to parse %s' % self.msg
                 
@@ -387,15 +387,15 @@ class GPSString(object):
                 fields = gps_extract.split(',')
                 'Handle PASHR Fields'
                 self.handlegpstime(fields[1])
-                self.heading = dec.Decimal(fields[2])
-                self.roll = dec.Decimal(fields[4])
-                self.pitch = dec.Decimal(fields[5])
-                self.heave = dec.Decimal(fields[6])
-                self.rollaccuracy = dec.Decimal(fields[7])
-                self.pitchaccuracy = dec.Decimal(fields[8])
-                self.headingaccuracy = dec.Decimal(fields[9])
-                self.headingalgorithm = dec.Decimal(fields[10])
-                self.imustatus = dec.Decimal(fields[11])
+                self.heading = float(fields[2])
+                self.roll = float(fields[4])
+                self.pitch = float(fields[5])
+                self.heave = float(fields[6])
+                self.rollaccuracy = float(fields[7])
+                self.pitchaccuracy = float(fields[8])
+                self.headingaccuracy = float(fields[9])
+                self.headingalgorithm = float(fields[10])
+                self.imustatus = float(fields[11])
             else:
                 raise self.FailedParsing, 'Failed to parse %s' % self.msg
  
@@ -415,10 +415,10 @@ class GPSString(object):
                 self.handlegpstime(fields[1])
                 self.handle_lat(fields[3],fields[4])
                 self.handle_lon(fields[5],fields[6])
-                self.quality = dec.Decimal(fields[7])
-                self.svs = dec.Decimal(fields[8])
-                self.dop = dec.Decimal(fields[9])
-                self.eht = dec.Decimal(fields[10][3:fields[10].__len__()])
+                self.quality = float(fields[7])
+                self.svs = float(fields[8])
+                self.dop = float(fields[9])
+                self.eht = float(fields[10][3:fields[10].__len__()])
             else:
                 raise self.FailedParsing, 'Failed to parse %s' % self.msg
                
@@ -444,18 +444,18 @@ class GPSString(object):
         the date.
         '''
         tmptime = timestr
-        hour = dec.Decimal(tmptime[0:2])
+        hour = int(tmptime[0:2])
         try:
-            minute = dec.Decimal(tmptime[2:4])
+            minute = int(tmptime[2:4])
         except dec.InvalidOperation:
             print(timestr)
             print(tmptime[2:4])
             print(self.msg)
             sys.exit()
             
-        seconds = int(dec.Decimal(tmptime[4:tmptime.__len__()]))
-        microseconds = int( (dec.Decimal(tmptime[4:tmptime.__len__()]) - \
-                                 dec.Decimal(seconds) ) * 1000000 )
+        seconds = int(float(tmptime[4:tmptime.__len__()]))
+        microseconds = int( (float(tmptime[4:tmptime.__len__()]) - \
+                                 float(seconds) ) * 1000000 )
 
         timeval = datetime.time(hour, minute, seconds, microseconds)
 
@@ -473,9 +473,9 @@ class GPSString(object):
         @param lathem: The NMEA latitude hemisphere ('N'/'S')
         '''
         
-        self.latitude = '%.10f' % (dec.Decimal(lattmp[0:2]) + 
-                         dec.Decimal(lattmp[2:lattmp.__len__()]) / 60)
-        self.latitude = dec.Decimal(self.latitude)
+        self.latitude = '%.10f' % (float(lattmp[0:2]) + 
+                         float(lattmp[2:lattmp.__len__()]) / 60)
+        self.latitude = float(self.latitude)
         if lathem == 'S':
             self.latitude = - self.latitude
 
@@ -487,9 +487,9 @@ class GPSString(object):
         @param lontmp: The NMEA longitude string. (DDDMM.MMMM)
         @param lonhem: The NMEA longitude hemisphere ('E'/'W')
         '''
-        self.longitude = '%.10f' % (dec.Decimal(lontmp[0:3]) + 
-                          dec.Decimal(lontmp[3:lontmp.__len__()]) / 60)
-        self.longitude = dec.Decimal(self.longitude)
+        self.longitude = '%.10f' % (float(lontmp[0:3]) + 
+                          float(lontmp[3:lontmp.__len__()]) / 60)
+        self.longitude = float(self.longitude)
         if lonhem == 'W':
             self.longitude = - self.longitude
 
@@ -657,6 +657,9 @@ if __name__ == '__main__':
     parser.add_argument('-m',dest='matflag',action='store_true',
                         help='Write the output file in MATLAB .mat format. (NOT YET SUPPORTED)',
                         default=False)
+    parser.add_argument('-d',dest='debug',action='count',
+                         help='Debug mode.')
+
     parser.add_argument('-v',dest='verbose',action='count',
                          help='Verbose output. (-v, -vv, -vvv, etc.)')
             
@@ -668,6 +671,8 @@ if __name__ == '__main__':
     verbose = args.verbose
     output = args.output
     matflag = args.matflag
+    if args.debug:
+    	verbose = 3
 
             
     if verbose >= 1:
@@ -859,11 +864,12 @@ if __name__ == '__main__':
     # PROCESS THE FILE(s) #
     #######################
     for filename in filestoprocess:
-
-            
+    	
+    	failedchecksumctr = 0
+		    
         # Gives status to stdout only when output is not stdout.
         if verbose >=1 and outputtofile:
-            print('Processing ' + filename)
+	            print('Processing ' + filename.name)
         if filename != sys.stdin:
             filetoread = file(filename,'r')
         else:
@@ -970,8 +976,10 @@ if __name__ == '__main__':
                         print("Fields: " + ','.join(gps.fields.keys()))
                         
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum: "
-                                      " :: " + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+                        sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n')
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1002,8 +1010,10 @@ if __name__ == '__main__':
                 try: 
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum: " + gps.checksum() + 
-                                      " :: " + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+                        sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n') 
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1024,8 +1034,10 @@ if __name__ == '__main__':
                 try:
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum: " + gps.checksum() + 
-                                      " :: " + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+	                    sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n')  
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1052,8 +1064,10 @@ if __name__ == '__main__':
                 try:
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum: " + gps.checksum() + 
-                                      " :: " + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+	                    sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n') 
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1080,8 +1094,10 @@ if __name__ == '__main__':
                 try: 
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum: " + gps.checksum() + 
-                                      " :: " + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+	                    sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n') 
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1105,8 +1121,10 @@ if __name__ == '__main__':
                 try:
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum:" + gps.checksum() + 
-                                      "::" + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+	                    sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n') 
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1126,8 +1144,10 @@ if __name__ == '__main__':
                 try:
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum:" + gps.checksum() + 
-                                      "::" + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+	                    sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n') 
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1145,8 +1165,10 @@ if __name__ == '__main__':
                 try:
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum:" + gps.checksum() + 
-                                      "::" + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+	                    sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n')  
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
@@ -1174,8 +1196,10 @@ if __name__ == '__main__':
                 try:
                     gps.parse()
                 except gps.FailedChecksum:
-                    sys.stderr.write( "Failed Checksum:" + gps.checksum() + 
-                                      "::" + gps.msg + '\n') 
+                    failedchecksumctr+=1
+                    if verbose:
+	                    sys.stderr.write( "Failed Checksum: "
+    	                                  " :: " + gps.msg + '\n') 
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
                     continue
@@ -1195,6 +1219,8 @@ if __name__ == '__main__':
         ###############################################################
         ##### END READING FILE ########################################
         ###############################################################
+        if failedchecksumctr:
+            sys.stderr.write("*** Failed Checksum Count: %d ***\n" % failedchecksumctr)
                 
         if outputtofile and not saveto1file:
             fid.close()
