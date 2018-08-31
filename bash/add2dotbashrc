@@ -1,0 +1,8 @@
+# Bashrc file additions to make life easier
+
+
+# Set some alias
+alias look='find . -type f | grep'
+alias lookin='find . -type f | xargs grep'
+alias rsynctofat="rsync -rltDvP --modify-window=2"
+alias ll="ls -lv" 
