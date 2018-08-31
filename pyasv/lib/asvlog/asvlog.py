@@ -161,5 +161,5 @@ class asvlog(object):
             matfilename = self.filename[:-3] + 'mat'
         
         # Write the file.
-        sio.savemat(os.path.expanduser(matfilename),tmp)
+        sio.savemat(os.path.expanduser(matfilename),tmp,do_compression=True)
             
