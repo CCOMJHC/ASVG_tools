@@ -29,7 +29,7 @@ provide units which, by standard or convention, never seem to change.
 
 GPSparser is designed for follow-on processing and plotting of values,
 and therefore every effort is made to convert all fields to
-meaningful, numeric values (objects of the Decimal Class). For example, Latitude and
+meaningful, numeric values. For example, Latitude and
 Longitude are converted to decimal degrees to 10 digits past the
 decimal point. Similarly, GPS fix type in RMC strings are indicated by an "A"
 when the GPS has a fix and a "V" when it does not. These values are
@@ -61,9 +61,9 @@ depending on the number of satellites tracked.
 @author: '''+__author__+'''
 @organization: Center for Coastal and Ocean Mapping, University of New Hampshire 
 @version: ''' + __version__ +'''
-@copyright: 2008-2016
+@copyright: 2008-2018
 @status: under development
-@license: GPL
+@license: LGPL
 
 @bug: I've tried to handle several fields gracefully when they are commonly missing, but an empty line with a proper checksum, such as is common before a GPS has a fix will surely cause the code to fail. 
 
@@ -78,11 +78,8 @@ import datetime
 from datetime import timedelta
 import dateutil.parser
 import re
-#import string
-import decimal as dec
-#import pdb
 from operator import xor
-#import exceptions 
+import pandas as pd
 
 # A function for writing to standard error vs standard out. 
 def eprint(*args, **kwargs):
@@ -249,7 +246,7 @@ class GPSString(object):
                 self.handlegpstime(fields[1])
                 try:
                     self.tzoffsethours = float( fields[5] )
-                except dec.InvalidOperation:
+                except:
                     if self.debug:
                         eprint("Thef ield Local TZ Offset Hours may not be present.")
                         eprint (fields[5])
@@ -257,7 +254,7 @@ class GPSString(object):
 
                 try:
                     self.tzoffsetminutes = float( fields[6] )
-                except dec.InvalidOperation:
+                except:
                     if self.debug: 
                         eprint("The field Local TZ Offset Minutes may not be present.")
                         eprint(fields[6])
@@ -338,13 +335,13 @@ class GPSString(object):
                     self.elevation.append(float(fields[idx + 1]))
                     try:
                         self.azimuth.append(float(fields[idx + 2]))
-                    except dec.InvalidOperation:
+                    except:
                         self.azimuth.append(float('NaN'))
                         eprint("The field Satellite Azimuth may be missing.")
                         eprint(fields[idx + 3])
                     try:
                         self.snr.append(float(fields[idx + 3]))
-                    except dec.InvalidOperation:
+                    except:
                         # The spec says snr should be null when "not tracking"
                         self.snr.append(float('NaN'))
             else:
@@ -447,7 +444,7 @@ class GPSString(object):
         hour = int(tmptime[0:2])
         try:
             minute = int(tmptime[2:4])
-        except dec.InvalidOperation:
+        except:
             print(timestr)
             print(tmptime[2:4])
             print(self.msg)
@@ -553,10 +550,14 @@ class GPSString(object):
 
         YYYY    MH    DD    HR    MN    SS
 
-        whiich can be converted to MATLABs internal representation of time with 
+        which can be converted to MATLABs internal representation of time with 
         datevec(). This method returns such as time stamp from a datetime object.
         '''
         return "\t".join(map(str,( dts.year, dts.month, dts.day, dts.hour, dts.minute, float(dts.second) + float(dts.microsecond) / 1000000 )))
+
+    def datetimevec_numeric(self,dts):
+        ''' Converts datetime object to vector '''
+        return [dts.year, dts.month, dts.day, dts.hour, dts.minute, float(dts.second) + float(dts.microsecond) / 1000000]
 
     def checksum(self, verify = False):
         ''' 
@@ -657,6 +658,8 @@ if __name__ == '__main__':
     parser.add_argument('-m',dest='matflag',action='store_true',
                         help='Write the output file in MATLAB .mat format. (NOT YET SUPPORTED)',
                         default=False)
+    parser.add_argument('-5',dest='hdfflag',action='store_true',
+                        help='Write the resulting data in to an HDF5 file',default=False)
     parser.add_argument('-d',dest='debug',action='count',
                          help='Debug mode.')
 
@@ -671,6 +674,8 @@ if __name__ == '__main__':
     verbose = args.verbose
     output = args.output
     matflag = args.matflag
+    hdfflag = args.hdfflag
+    
     if args.debug:
     	verbose = 3
 
@@ -714,6 +719,9 @@ if __name__ == '__main__':
             if verbose >=1:
                 print("Output directory: " + outputdir)
                 print("Output filename: Not specified")
+
+            if matflag or hdfflag:
+                saveto1file = True
 
         # Or we can set a file name directly. Then set everything.
         # Two things could have happened here. Either the directory did not 
@@ -864,8 +872,10 @@ if __name__ == '__main__':
     # PROCESS THE FILE(s) #
     #######################
     for filename in filestoprocess:
-    	
-    	failedchecksumctr = 0
+        
+        data = []
+        
+        failedchecksumctr = 0
 		    
         # Gives status to stdout only when output is not stdout.
         if verbose >=1 and outputtofile:
@@ -884,19 +894,29 @@ if __name__ == '__main__':
         # Set up the output file name if output to a file is requested. 
         # The output may be of txt or .mat type.
         # By now the output directory (outputdir), is already specified.
-        if outputtofile or matflag:
+        if outputtofile or matflag or hdfflag:
+            
             if outfilename is not None:
+                # In this case we specified the filename directly.
                 pass
-            if outfilename == None and not matflag and filename == sys.stdin:
+            if outfilename == None and not matflag and not hdfflag and filename == sys.stdin:
+                # In this case we only specified the output directory and no explcit file type.
                 outfilename = ('data' +
-                '_parsed_'+ stringtype +'.txt')
-            if outfilename == None and not matflag:
+                               '_parsed_'+ stringtype +'.txt')
+            if outfilename == None and not matflag and not hdfflag:
+                # In this case we only specified the output directory and an input file name
                 outfilename = (os.path.basename(filename) +
-                '_parsed_'+ stringtype +'.txt')
+                               '_parsed_'+ stringtype +'.txt')
             elif outfilename == None and matflag:
+                # In this case we specified to write out to a MATLAB file.
                 outfilename = (os.path.basename(filename) +
-                '_parsed_'+ stringtype +'.mat')
-
+                               '_parsed_'+ stringtype +'.mat')
+            elif outfilename == None and hdfflag and not filename == sys.stdin:
+                outfilename = (os.path.basename(filename) + 
+                                'parsed'+ stringtype +'.h5')
+            elif outfilename == None and hdfflag and filename == sys.stdin:
+                outfilename = ('data' +
+                               'parsed'+ stringtype +'.ph5')
             if verbose >=1:
                 print("Writing to %s" % os.path.join(outputdir,outfilename))        
 
@@ -904,7 +924,7 @@ if __name__ == '__main__':
         # If it is the first process in the list, always open it. 
         # If not, then only open a new file if not saving to a single file,
         # which would happen if the file name was explicitly set.
-        if outputtofile and not matflag: 
+        if outputtofile and not matflag and not hdfflag: 
             if filename == filestoprocess[0]:
                 fid = file(os.path.join(outputdir,outfilename),'w')
             elif not saveto1file:
@@ -928,7 +948,7 @@ if __name__ == '__main__':
                 gps.identify()  # populates gps.id
                 
             except NotImplementedError:
-                if verbose >= 1:
+                if verbose >= 3:
                     sys.stderr.write('Unrecognized NMEA string: %s\n' % gps.msg)
                 continue
             except:
@@ -977,32 +997,30 @@ if __name__ == '__main__':
                         
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
                         sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n')
                     continue
                 except gps.FailedParsing:
                     sys.stderr.write("Failed Parsing Line: %s" % line)
                     continue
-                except dec.InvalidOperation:
-                    sys.stderr.write("Failed Parsing Line: %s" % line)
-                    continue
                 except:
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
                     
-                fieldstoprint = [gps.datetimevec(gps.datetime), 
-                                 gps.latitude, 
+                fieldstoprint = (gps.datetimevec_numeric(gps.datetime) + 
+                                 [gps.latitude, 
                                  gps.longitude, 
                                  gps.quality,
                                  gps.svs, 
                                  gps.hdop, 
                                  gps.antennaheight,
-                                 gps.geoid]
+                                 gps.geoid])
                 if PCtime:
-                    fieldstoprint.insert(0,gps.datetimevec(PCtime))
+                    #fieldstoprint.insert(0,gps.datetimevec(PCtime))
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
     
-                printfields(fieldstoprint,fid)
+                #printfields(fieldstoprint,fid)
                 
     
             if gps.id == 'ZDA':
@@ -1011,7 +1029,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
                         sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n') 
                     continue
@@ -1035,7 +1053,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
 	                    sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n')  
                     continue
@@ -1065,7 +1083,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
 	                    sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n') 
                     continue
@@ -1095,7 +1113,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
 	                    sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n') 
                     continue
@@ -1122,7 +1140,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
 	                    sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n') 
                     continue
@@ -1145,7 +1163,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
 	                    sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n') 
                     continue
@@ -1166,7 +1184,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
 	                    sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n')  
                     continue
@@ -1197,7 +1215,7 @@ if __name__ == '__main__':
                     gps.parse()
                 except gps.FailedChecksum:
                     failedchecksumctr+=1
-                    if verbose:
+                    if verbose > 1:
 	                    sys.stderr.write( "Failed Checksum: "
     	                                  " :: " + gps.msg + '\n') 
                 except gps.FailedParsing:
@@ -1215,12 +1233,40 @@ if __name__ == '__main__':
                                  gps.dop, 
                                  gps.eht]
                 printfields(fieldstoprint,fid)
-        
+
+            # Print parsed fields to stdout or an open file.
+            if not matflag and not hdfflag:
+                printfields(fieldstoprint,fid)
+            data.append(fieldstoprint)  
+            # END READING LINE
+            
         ###############################################################
         ##### END READING FILE ########################################
         ###############################################################
+        if hdfflag:
+            
+            timenames = ['year','month','day','hour','minute','second']
+            fieldnames = assign_fieldnames(stringtype)
+            fieldnames = fieldnames[2:]
+            columnnames = timenames + fieldnames 
+            if PCtime:
+                columnnames = map(lambda x: 'PC_'+ x,timenames) + columnnames
+            df = pd.DataFrame(data,columns = columnnames)
+            datakey = '/'+stringtype
+            if verbose:
+                print(df.head())
+                print('HDF File: ' + os.path.join(outputdir,outfilename))
+                print('HDF Data Key: ' + datakey)
+            try:
+                df.to_hdf(os.path.join(outputdir,outfilename),key=datakey,format='table',mode='w')
+            except:
+                pass
+            
         if failedchecksumctr:
             sys.stderr.write("*** Failed Checksum Count: %d ***\n" % failedchecksumctr)
                 
         if outputtofile and not saveto1file:
             fid.close()
+    ### END READING ALL FILES
+    if not matflag and not hdfflag:
+        fid.close()
