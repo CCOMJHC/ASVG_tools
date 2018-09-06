@@ -1017,11 +1017,8 @@ if __name__ == '__main__':
                                  gps.antennaheight,
                                  gps.geoid])
                 if PCtime:
-                    #fieldstoprint.insert(0,gps.datetimevec(PCtime))
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
-    
-                #printfields(fieldstoprint,fid)
-                
+                    
     
             if gps.id == 'ZDA':
     
@@ -1043,10 +1040,8 @@ if __name__ == '__main__':
                 fieldstoprint = [gps.datetimevec(gps.datetime)]
     
                 if PCtime:
-                    fieldstoprint.insert(0,gps.datetimevec(PCtime))
-    
-                printfields(fieldstoprint,fid)
-    
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
+        
             if gps.id == 'RMC':
     
                 try:
@@ -1073,10 +1068,8 @@ if __name__ == '__main__':
                                  gps.magneticvariation]
     
                 if PCtime:
-                    fieldstoprint.insert(0,gps.datetimevec(PCtime))
-    
-                printfields(fieldstoprint,fid)
-    
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
+        
             if gps.id == 'GST':
     
                 try:
@@ -1103,10 +1096,8 @@ if __name__ == '__main__':
                                  gps.lon1sigma,
                                  gps.height1sigma]
                 if PCtime:
-                    fieldstoprint.insert(0,gps.datetimevec(PCtime))
-    
-                printfields(fieldstoprint,fid)
-                                  
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
+                                      
             if gps.id == 'GSV':
     
                 try: 
@@ -1130,9 +1121,9 @@ if __name__ == '__main__':
                                  gps.elevation,
                                  gps.azimuth,
                                  gps.snr]
-                                 
-                printfields(fieldstoprint,fid)
-    
+                if PCtime:
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
+                                      
     
             if gps.id == 'VTG':
                 'VTG'
@@ -1155,9 +1146,9 @@ if __name__ == '__main__':
                                 gps.cog,
                                 gps.knots,
                                 gps.kmph]
-                                
-                printfields(fieldstoprint,fid)
-            
+                if PCtime:
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
+                                             
             if gps.id == 'HDT':
                 try:
                     gps.parse()
@@ -1176,7 +1167,8 @@ if __name__ == '__main__':
                     
                 fieldstoprint = [gps.datetimevec(PCtime),
                                  gps.heading]
-                printfields(fieldstoprint,fid)
+                if PCtime:
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                 
                                  
             if gps.id == 'PASHR':
@@ -1205,10 +1197,8 @@ if __name__ == '__main__':
                                  gps.headingalgorithm,
                                  gps.imustatus]
                 if PCtime:
-                    fieldstoprint.insert(0,gps.datetimevec(PCtime))
-                      
-                printfields(fieldstoprint,fid)
-              
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
+                                     
             if gps.id == 'GGK':
                 'GGK'
                 try:
@@ -1232,9 +1222,12 @@ if __name__ == '__main__':
                                  gps.svs, 
                                  gps.dop, 
                                  gps.eht]
-                printfields(fieldstoprint,fid)
+                if PCtime:
+                    fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
 
-            # Print parsed fields to stdout or an open file.
+            ### END if gps.id BLOCK ###
+
+            ### Print the line of parsed fields to stdout or an open file.
             if not matflag and not hdfflag:
                 printfields(fieldstoprint,fid)
             data.append(fieldstoprint)  
