@@ -43,7 +43,7 @@ if strcmp(filetype,'table')
 % For format='table' generated files from pandas (pytables format), text
 % data is written, (and can be read by MATLAB) as a character array. This
 % line reads all the data. 
-values = h5read(filename,'/hdt/table');
+values = h5read(filename,[Groups{1} '/table']);
 
 
 GroupDataSetsAttributesNames = {M.Groups.Datasets.Attributes.Name};
@@ -109,8 +109,10 @@ end
 
 function output = extract_text_from_python(input)
 
-% Remove single quotes which confound me.
+% Remove single quotes which confound me, and add a unique delimiter.
 tmp = strrep(input,'''','%%%');
+% Remove all other odd characters, but keep the delimiter.
+tmp = regexprep(tmp,'[^a-zA-Z_0-9%]+','');
 % Split on delimiter.
 tmp2 = regexp(tmp,'%%%(\w+)%%%','tokens');
 % Pull results out of embedded cell.
