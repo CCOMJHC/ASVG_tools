@@ -71,7 +71,13 @@ for i=1:length(GroupDataSetsAttributesNames)
             % Handle strings differently since they come in a 3D matrix of
             % chars.
             if STRINGDATA
-                data.(blockfieldnames{q}) = squeeze(values.(BlockGroupName)(:,q,:))';       
+                % Handle when there is more than one column of strings
+                % which produces a 3D matrix of characters.
+                if ndims(values.(BlockGroupName)) == 2
+                    data.(blockfieldnames{q}) = values.(BlockGroupName)';                
+                elseif ndims(values.(BlockGroupName)) == 3
+                    data.(blockfieldnames{q}) = squeeze(values.(BlockGroupName)(:,q,:))';
+                end
             else
                 data.(blockfieldnames{q}) = values.(BlockGroupName)(q,:)';
             end
