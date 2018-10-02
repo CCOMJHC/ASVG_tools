@@ -11,6 +11,7 @@ import sys
 import os
 import argparse
 import fnmatch
+import pandas as pd
 
 parser = argparse.ArgumentParser()
 
@@ -267,6 +268,18 @@ nmea2000fieldnames = [	["log_timestamp","log_date","log_time","CAN_data",
 # think it better to try to clean them up here. So lets make this
 # simplier. 
 
+# A list of the commands to execute - for calling in parallel
+cmds_to_execute = []
+
+# Check to see if parallel is installed and in the path.
+USEPARALLEL = any(os.access(os.path.join(path, 'parallel'), os.X_OK) for path in os.environ["PATH"].split(os.pathsep))
+if USEPARALLEL:
+    print("Found BASH parallel. Using it!")
+else:
+    print("Did not find BASH parallel. To extract NMEA2000 logs faster try")
+    print("  sudo yum install parallel")
+
+
 # Get a summary of the available logs types. 
 cmd = ('/bin/cat ' + 
        os.path.join(os.path.join(directory,'device'),'*.nmea2000') + ' | ' + 
@@ -306,6 +319,7 @@ for line in file(outputdir + '/nmea2000_logsummary.txt','r'):
     for field in nmea2000fieldnames[nmea2000logtypes.index(pgn)]:
         cmd += field + ','
 
+    # Create the output file and write the field name header.
     outputfile = os.path.join(outputdir,
                               ('nmea2000_'+ 
                                nmea2000logsummary[nmea2000logtypes.index(pgn)]
@@ -318,47 +332,30 @@ for line in file(outputdir + '/nmea2000_logsummary.txt','r'):
     fid.write(' '.join(nmea2000fieldnames[nmea2000logtypes.index(pgn)])+"\n")
     fid.close()
 
-    # Redirect the output to the output file. 
+    # Modify the extraction command to append to the output file. 
     cmd += ' >> ' + outputfile
     if verbose >= 1:
         print 'Executing ' + cmd
-    
+
+    # Tally the list of commands to execute for parallel operation later.
+    cmds_to_execute.append(cmd)
+
+    # If not executing in parallel, execute them one at a time here.
+    if not USEPARALLEL:
+        if not dryrun:
+            os.system(cmd)
+        else:
+            print("DRYRUN, would execute: " + cmd)
+
+if USEPARALLEL:
+    # Use bash parallel to execute the extraction simultaneously.
+    cmd = 'parallel --will-cite --xapply --load 90% --noswap --jobs 0 --joblog - {} ::: ' + " ".join("'" + item + "'" for item in cmds_to_execute)
+
+    # Execute them
     if not dryrun:
         os.system(cmd)
+    else:
+        print("DRYRUN, would execute: " + cmd)
 
-# # Recursively look for data files in the specified directory. 
-# nmea2000filestoprocess = []
-
-# ######################### NMEA2000 LOGS #############################
-# for root, dirnames, filenames in os.walk(directory):
-#     for filename in fnmatch.filter(filenames,'*.nmea2000'):
-#         nmea2000filestoprocess.append(os.path.join(root,filename))
-
-# print nmea2000filestoprocess
-
-# for nmeafile in nmea2000filestoprocess:
-
-#     print "Parsing " + nmeafile
-
-
-#     for idx in range(0,nmea2000logtypes.__len__()-1):
-
-
-#         if type == nmea2000logtypes[idx] or type == "all":
-
-#             cmd = ('/bin/cat ' + nmeafile + ' | readnmea2000 -t ' +
-#             nmea2000logtypes[idx]) + '='
-
-#             for field in nmea2000fieldnames[idx]:
-#                 cmd += field + ','
-
-#         outputfilename = os.path.join(outputdir,os.path.basename(nmeafile[:-4]) + '_' + nmea2000logtypes[idx] + '.tab')
-
-#         cmd += ' > ' + outputfilename
-#         print ("Executing: " + cmd)
-# 	if not dryrun:
-# 		os.system(cmd)
-
-# # cat *_4.nmea2000 | readnmea2000 -t pgn128267=log_timestamp,transducer_water_depth | sed 's/ /\t/g'
     
     
