@@ -3,7 +3,7 @@
 # Val Schmidt
 # Center for Coastal and Ocean Mapping
 # University of New Hampshire
-# Copyright 2016
+# Copyright 2016-2018
 #
 #
 # TO DO:
@@ -30,6 +30,7 @@ DO0183=0
 PRINTHELP=0
 GOTOUTPUT=0
 VERBOSE=0
+PARALLEL=0
 
 while getopts ":rewqhad:o:v" opt; do
 
@@ -76,6 +77,18 @@ while getopts ":rewqhad:o:v" opt; do
     esac
 
 done
+
+# Execute in parallel if the parallel program exists.
+if [ -x "$(command -v parallal)" ]; then
+    echo "Extracting using gnu parallal."
+    PARALLEL=1
+else
+    echo "Gnu parallal command does not exist."
+    echo "Continuing with single processor extraction."
+    echo "Install gnu parallel to speed things up"
+    echo "sudo yum install parallel"
+    PARALLEL=0
+fi
 
 if [ "$VERBOSE" == 1 ]; then
 echo "DO CW4: $DOCW4"
@@ -273,23 +286,19 @@ for datadir in ${datadirs[@]}; do
     complete_outputdirs=( "${complete_outputdirs[@]}" ${complete_outputdir} )
     outputspecs=( "${outputspecs[@]}" ${outputspec} )
 
-    if [ "$DOCW4" == 1 ]; then
-	
-	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
-	asv_exec "${CMD}" "${VERBOSE}"
+    # Non parallel execution
+    if [ "$DOCW4" == 1 ] && [ "$PARALLEL" == 0 ]; then
+    	
+    	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
+    	asv_exec "${CMD}" "${VERBOSE}"
     fi
 
 done
 
-#for x in `seq 0 1`; do
-#echo "${datadirs[$x]}, ${complete_outputdirs[$x]}, ${outputspecs[$x]}"
-#done
-#exit
-
 # Capture where the command was executed from.
 CWD=`pwd`
 
-function extract_data() {
+function extract_cw4_binary_data() {
 
 	# The original command before we made this parallel:
 	# CMD="/usr/local/bin/data-export-cli -d ${ccscm}/scm-vp/${datadir} -x ${outputspec} >> ${complete_outputdir}/export.log 2>&1 &"
@@ -299,14 +308,14 @@ function extract_data() {
 }
 export -f extract_data
 
-# Execute the data extraction in parallel, being careful about memory.
-# and not exceeding the number of cores.
-if [ "$DOCW4" == 1 ]; then
+# Execute the data extraction in parallel, being careful about memory (--noswap).
+# and not exceeding the number of cores (--load).
+if [ "$DOCW4" == 1 ] && [ "$PARALLEL" == 1 ] ; then
 	echo "Launching data export processes..."
 	if [ "$VERBOSE" == 1 ]; then
-	    parallel -v --xapply --load 90% --noswap --jobs 0 --joblog - extract_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
+	    parallel --bibtex -v --xapply --load 90% --noswap --jobs 0 --joblog - extract_cw4_binary_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
         else
-	    parallel --xapply --load 90% --noswap --jobs 0 --joblog - extract_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
+	    parallel --bibtex --xapply --load 90% --noswap --jobs 0 --joblog - extract_cw4_binary_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
         fi
 fi
 
@@ -329,13 +338,8 @@ for datadir in ${datadirs[@]}; do
     if [ "$DOCSV" == 1 ]; then
 	echo ""
 	echo "Parsing CSV files for MATLAB."
-	#if [ "$DOCW4" == 1 ]; then
-	    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${complete_outputdir}\" -o i -vv"
-	    asv_exec "${CMD}" "${VERBOSE}"
-	#else
-	#    CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${ccscm}/${datadir}\" -o \"${outputdir}/${datadir}\" -vv"
-	    asv_exec "${CMD}" "${VERBOSE}"
-	#fi
+	CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${complete_outputdir}\" -o i"
+	asv_exec "${CMD}" "${VERBOSE}"
 	echo ""
     fi
 
