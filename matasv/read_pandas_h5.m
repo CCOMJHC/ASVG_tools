@@ -50,26 +50,64 @@ GroupDataSetsAttributesNames = {M.Groups.Datasets.Attributes.Name};
 GroupDataSetsAttributesValues = {M.Groups.Datasets.Attributes.Value};
 
 STRINGDATA = false;
-for i=1:length(GroupDataSetsAttributesNames)
-        
-    % Search for the attributes that have the field names for each column
-    % in the data block      
-    if regexp(GroupDataSetsAttributesNames{i},'values_block_\d+_kind')
-        
-        if regexp(GroupDataSetsAttributesValues{i+2},'^string')
-            STRINGDATA = true;
-        else
-            STRINGDATA = false;
-        end
-        
-        % Extract the field names for the block from the pythonic text.
-        blockfieldnames = extract_text_from_python(GroupDataSetsAttributesValues(i));
 
-        % Allocate columns to named fields in the output data structure. 
+% The data in the file is organized roughly into blocks of common type.
+% Each of these is called a data "block". So for each data block,
+% we need to extract the field names for the columns of that block, and
+% if the block is of type "string" we need to do some special handling.
+% The metadata is extracted by MATLAB into two cell arrays, one containing
+% the type of metadata and the second containing the metadata values. 
+% Unfortunately, we cannot rely on the order of these entries being the
+% same, so we have to look for the fields we want. 
+
+% For each data block, the column names are listed in a metadata field
+% called 'values_block_DD_kind', where DD is an integer indicating one of
+% the blocks of data. 
+
+% This bit of code searches the metadata fieldnames and extracts the data
+% block index (the DD above), and the indices of the cell array entries where the
+% column names can be found for that data block. 
+tmp = regexp(GroupDataSetsAttributesNames,'values_block_(\d+)_kind','tokens');
+column_name_indices = find(cellfun(@(x) ~isempty(x),(regexp(GroupDataSetsAttributesNames,['values.*kind']))));
+ctr = 1;
+for i=1:length(tmp)
+    if ~isempty(tmp{i})
+        blocknumber{ctr} = tmp{i}{1}{1};
+        ctr = ctr + 1;
+    end
+end
+
+% Now we loop through each data block by it's block index. (blocknumber)
+for i=1:length(blocknumber)
+   
+    % For each block, we need it's type, so we search the metadata names
+    % cell array for the 'dtype' entry for that block number.
+    type_index = find(strcmp(GroupDataSetsAttributesNames,['values_block_' blocknumber{i} '_dtype']));
+    
+    % Check to see if it's a string, because we extract the data
+    % differently for strings than numerica data.
+    if regexp(GroupDataSetsAttributesValues{type_index},'^string')
+        STRINGDATA = true;
+    else
+        STRINGDATA = false;
+    end
+    
+    
+    % Extract the field names for the block from the pythonic text.
+    blockfieldnames = extract_text_from_python(GroupDataSetsAttributesValues(column_name_indices(i)));
+
+        % Loop through the column names and allocate columns to named
+        % fields in the output data structure.  
         for q=1:length(blockfieldnames)
-            BlockGroupName = GroupDataSetsAttributesNames{i}(1:end-5);
-            % Handle strings differently since they come in a 3D matrix of
-            % chars.
+            
+            % Generate the BlockGroupName which is how each data block is
+            % named when extracted from the hdf5 file.
+            BlockGroupName = ['values_block_' blocknumber{i}];
+            
+            % Finally, copy the data read from the hdf5 file to the output
+            % data structure, whose field name is given by the column name
+            % in the hdf5 table. Handle strings differently since they come
+            % in a 3D matrix of chars.
             if STRINGDATA
                 % Handle when there is more than one column of strings
                 % which produces a 3D matrix of characters.
@@ -82,33 +120,12 @@ for i=1:length(GroupDataSetsAttributesNames)
                 data.(blockfieldnames{q}) = values.(BlockGroupName)(q,:)';
             end
         end
-    end
-    
-    
-    
 end
 
 
+
+
 end
-% Set the field names
-% for i=1:Nfields
-%     % Modify field names to comply with MATLAB variable naming syntax.
-%     fieldname = fieldnamelist{i};
-%     fieldname = strrep(fieldname,'(','_');
-%     fieldname = strrep(fieldname,')','');
-%     fieldname = strrep(fieldname,'%','Pct');
-%     fieldname = strrep(fieldname,'|','');
-%     fieldname = strrep(fieldname,'-','_');
-%     fieldname = strrep(fieldname,'/','_');
-%     fieldname = strrep(fieldname,'\','_');
-%     if strcmp(fieldname(1),'1')
-%         fieldname = ['One' fieldname(2:end)];
-%     end
-%     % Catch anything else...
-%     fieldname = regexprep(fieldname,'\W+','');
-%     % Set the field names
-%     data.(fieldname) = values(:,i);
-% end
 
 end
 
