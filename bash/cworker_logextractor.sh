@@ -321,7 +321,6 @@ if [ "$DOCW4" == 1 ] && [ "$PARALLEL" == 1 ] ; then
         fi
 fi
 
-
 # Parse the data. 
 for datadir in ${datadirs[@]}; do
 
@@ -329,7 +328,7 @@ for datadir in ${datadirs[@]}; do
     complete_outputdir="${outputdir}/extracted_logs/${datadir}"
     outputspec="$complete_outputdir/configs/${datadir}_export_config.exs"
     # If we extracted CW4 logs, then we made these directories already, so omit this.
-    if [ "$DOCW4" == 0 ]; then
+    if [ "$DOCW4" == 0 ] ; then
         echo "mkdir $complete_outputdir"
         mkdir -p "$complete_outputdir/configs/"
     fi
