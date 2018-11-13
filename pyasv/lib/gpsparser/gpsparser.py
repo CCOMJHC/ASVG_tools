@@ -937,8 +937,12 @@ if __name__ == '__main__':
         if not saveto1file:
             outfilename = None        
         
+        HAVEDATA = False
+
         for line in filetoread:
-    
+
+            HAVEDATA = True
+
             gps = GPSString(line)
             if verbose >=3:
                 gps.debug = verbose
@@ -972,7 +976,7 @@ if __name__ == '__main__':
                 PCtime = gps.stripepochtime()
             if PCtime == None:
                 PCtime = gps.strip_timestamp()
-                
+
             # Many GPS strings have only a time stamp with no date. Here we try to 
             # use the date provided by a PC time stamp during the logging porcess.
             # If there is no PC time stamp, one can only guess at the date and 
@@ -986,7 +990,7 @@ if __name__ == '__main__':
                 if gps.debug:
                     print("NO Time Stamping Found. Using today's date.")
                 gps.date = datetime.datetime.utcnow().date()
-            
+
             ''' Parse and write data.'''
             if gps.id == 'GGA':
     
@@ -1232,22 +1236,37 @@ if __name__ == '__main__':
                 printfields(fieldstoprint,fid)
             data.append(fieldstoprint)  
             # END READING LINE
-            
+        
+
         ###############################################################
         ##### END READING FILE ########################################
         ###############################################################
+
+        if not HAVEDATA:
+            print("No data to process.")
+            sys.exit()
+
         if hdfflag:
             
             timenames = ['year','month','day','hour','minute','second']
             fieldnames = assign_fieldnames(stringtype)
-            fieldnames = fieldnames[2:]
+            # Here we are removing the time stamp field names and replacing 
+            # them with those above.
+            if (stringtype == 'VTG' or 
+                stringtype == 'GSV' or 
+                stringtype == 'HDT' or
+                stringtype == 'GSV'):
+                fieldnames = fieldnames[1:]
+            else:
+                fieldnames = fieldnames[2:]
             columnnames = timenames + fieldnames 
             if PCtime:
                 columnnames = map(lambda x: 'PC_'+ x,timenames) + columnnames
 
             if verbose:
                 print('Columns: %s' % ",".join(columnnames))
-                print(data)
+                for idx in range(10):
+                    print(data[idx])
             df = pd.DataFrame(data,columns = columnnames)
             datakey = '/'+stringtype
             if verbose:
