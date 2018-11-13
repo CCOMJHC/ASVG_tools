@@ -306,7 +306,7 @@ function extract_cw4_binary_data() {
 	asv_exec "${CMD}" "${VERBOSE}"
 
 }
-export -f extract_data
+export -f extract_cw4_binary_data
 
 # Execute the data extraction in parallel, being careful about memory (--noswap).
 # and not exceeding the number of cores (--load).
