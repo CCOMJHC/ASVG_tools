@@ -79,11 +79,11 @@ while getopts ":rewqhad:o:v" opt; do
 done
 
 # Execute in parallel if the parallel program exists.
-if [ -x "$(command -v parallal)" ]; then
-    echo "Extracting using gnu parallal."
+if [ -x "$(command -v parallel)" ]; then
+    echo "Extracting using gnu parallel."
     PARALLEL=1
 else
-    echo "Gnu parallal command does not exist."
+    echo "Gnu parallel command does not exist."
     echo "Continuing with single processor extraction."
     echo "Install gnu parallel to speed things up"
     echo "sudo yum install parallel"
@@ -287,7 +287,7 @@ for datadir in ${datadirs[@]}; do
     outputspecs=( "${outputspecs[@]}" ${outputspec} )
 
     # Non parallel execution
-    if [ "$DOCW4" == 1 ] && [ "$PARALLEL" == 0 ]; then
+    if [ "$DOCW4" == 1 ]; then
     	
     	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
     	asv_exec "${CMD}" "${VERBOSE}"
@@ -306,16 +306,18 @@ function extract_cw4_binary_data() {
 	asv_exec "${CMD}" "${VERBOSE}"
 
 }
+
 export -f extract_cw4_binary_data
+#export -f extract_data
 
 # Execute the data extraction in parallel, being careful about memory (--noswap).
 # and not exceeding the number of cores (--load).
 if [ "$DOCW4" == 1 ] && [ "$PARALLEL" == 1 ] ; then
 	echo "Launching data export processes..."
 	if [ "$VERBOSE" == 1 ]; then
-	    parallel --bibtex -v --xapply --load 90% --noswap --jobs 0 --joblog - extract_cw4_binary_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
+	    parallel --will-cite -v --xapply --load 90% --noswap --jobs 0 --joblog - extract_cw4_binary_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
         else
-	    parallel --bibtex --xapply --load 90% --noswap --jobs 0 --joblog - extract_cw4_binary_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
+	    parallel --will-cite --xapply --load 90% --noswap --jobs 0 --joblog - extract_cw4_binary_data ::: ${datadirs[*]} ::: ${outputspecs[*]} ::: ${complete_outputdirs[*]}
         fi
 fi
 
