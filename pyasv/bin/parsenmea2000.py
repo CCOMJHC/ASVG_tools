@@ -427,6 +427,7 @@ class nmea2000parser:
 
     def __init__(self,directory='.'):
         self.DOPARALLEL = False
+        self.DOHDF5 = False
         self.directory = directory
         self.outputdir = '.'
         self.type = 'all'
@@ -445,7 +446,7 @@ class nmea2000parser:
         # In some cases, the 'tr' bit below is required and others not. 
         # It is not clear why. 
         cmd = ('/bin/cat ' + 
-               os.path.join(os.path.join(self.directory,'device'),'*.nmea2000') + ' | ' + 
+               os.path.join(os.path.join(self.directory,'device'),'*.nmea2000') + ' 2>/dev/null | ' + 
                ' readnmea2000 -t paramGroup=pgn | tr \' \' \'\n\' | ' +
                ' sort | uniq -c | awk \'{print $2, "\t",$1}\' > ' + 
                self.outputdir + '/nmea2000_logsummary.txt')
@@ -497,7 +498,13 @@ class nmea2000parser:
                 continue
 
             # Create the output file and write the field name header.
-            outputfile = os.path.join(self.outputdir,
+            if logparser.DOHDF5:
+                outputfile = os.path.join(self.outputdir,
+                                      ('nmea2000_'+ 
+                                       nmea2000logsummary[nmea2000logtypes.index(pgn)]
+                                       + '_' + pgn + '.h5'))
+            else:
+                outputfile = os.path.join(self.outputdir,
                                       ('nmea2000_'+ 
                                        nmea2000logsummary[nmea2000logtypes.index(pgn)]
                                        + '_' + pgn + '.txt'))
@@ -547,7 +554,7 @@ class nmea2000parser:
 
         cmd_preamble = ('/bin/cat ' + 
                        os.path.join(os.path.join(directory,'device'),'*.nmea2000') + 
-                       ' | ')
+                       ' 2>/dev/null | ')
 
 
         # Check to see if parallel is installed and in the path.
@@ -682,6 +689,7 @@ if __name__ == '__main__':
     logparser.verbose = verbose
     logparser.outputdir = outputdir
     logparser.DOPARALLEL = True
+    logparser.DOHDF5 = DOHDF5
     logparser.type = type
     
     logparser.get_logsummary()

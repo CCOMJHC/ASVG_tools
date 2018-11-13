@@ -35,6 +35,10 @@ parser.add_argument("-l",'--log_device',
                     action = "store",
                     default = 'a',
                     help = 'Device index to parse (e.g. #.nmea0183)')
+parser.add_argument("-5",'--hdf',
+                    action = "store_true",
+                    default = 'False',
+                    help = 'Parse data to pytables HDF5 file.')
                     
 # Get list of files to parse.
 args = parser.parse_args()
@@ -43,7 +47,7 @@ dryrun =            args.dryrun
 verbose =           args.verbosity
 outputdir =         args.outputdir
 log_device =        args.log_device.split(',')
-
+hdf5 =              args.hdf
 
 ########################## NMEA 0183 ##################################        
 GPStypestoparse = ['GGA','RMC','VTG'] # Not currently parsing GSV or GLL
@@ -65,16 +69,15 @@ gpsparser = os.path.join(thisdir,'../lib/gpsparser/gpsparser.py')
 # NOTE: Device 3 is the onboard GPS.
 for device in devices_to_parse:
     for logtype in GPStypestoparse:
-        cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*' + device + '.nmea0183') 
-               + ' | strings | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
-               os.path.join(outputdir,logtype + '_' + device + '_.txt'))
-               #cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*nmea0183') 
-               #       + ' | perl -pe \'s/[^[:ascii:]]//g\' | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
-               #       os.path.join(outputdir,logtype + '.txt'))
-               
-               #cmd = (gpsparser + 
-               #       ' -g ' + os.path.join(directory,'device') + '::nmea0183' +
-               #' -s ' + logtype + ' -o ' + outputdir)
+	if hdf5:
+  	      cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*' + device + '.nmea0183') 
+      	         + ' | strings | ' + gpsparser + ' -5  -s ' + logtype + ' -o ' + 
+      	         os.path.join(outputdir,logtype + '_' + device + '.h5'))
+        else:
+        	cmd = ('/bin/cat ' + os.path.join(os.path.join(directory,'device'),'*' + device + '.nmea0183') 
+               	+ ' | strings | ' + gpsparser + ' -s ' + logtype + ' -o ' + 
+               	os.path.join(outputdir,logtype + '_' + device + '.txt'))
+
    
         if verbose >= 1:
             print "Executing: " + cmd
