@@ -1059,13 +1059,13 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
                       
-                fieldstoprint = [gps.datetimevec(gps.datetime),
-                                 gps.fixstatus,
+                fieldstoprint = (gps.datetimevec_numeric(gps.datetime) + 
+                                 [gps.fixstatus,
                                  gps.latitude,
                                  gps.longitude,
                                  gps.knots,
                                  gps.cog,
-                                 gps.magneticvariation]
+                                 gps.magneticvariation])
     
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
@@ -1087,14 +1087,14 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
                       
-                fieldstoprint = [gps.datetimevec(gps.datetime),
-                                 gps.residualrms,
+                fieldstoprint = (gps.datetimevec_numeric(gps.datetime) +
+                                 [gps.residualrms,
                                  gps.semimajor,
                                  gps.semiminor,
                                  gps.orientation,
                                  gps.lat1sigma,
                                  gps.lon1sigma,
-                                 gps.height1sigma]
+                                 gps.height1sigma])
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                                       
@@ -1116,11 +1116,11 @@ if __name__ == '__main__':
                     raise
                       
                     
-                fieldstoprint = [gps.datetimevec(PCtime),  
-                                 gps.PRN,
+                fieldstoprint = (gps.datetimevec_numeric(PCtime) +  
+                                 [gps.PRN,
                                  gps.elevation,
                                  gps.azimuth,
-                                 gps.snr]
+                                 gps.snr])
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                                       
@@ -1142,10 +1142,10 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
       
-                fieldstoprint = [gps.datetimevec(PCtime),
-                                gps.cog,
+                fieldstoprint = (gps.datetimevec_numeric(PCtime) +
+                                [gps.cog,
                                 gps.knots,
-                                gps.kmph]
+                                gps.kmph])
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                                              
@@ -1165,8 +1165,8 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
                     
-                fieldstoprint = [gps.datetimevec(PCtime),
-                                 gps.heading]
+                fieldstoprint = (gps.datetimevec_numeric(PCtime) +
+                                 [gps.heading])
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                 
@@ -1187,15 +1187,15 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
                 
-                fieldstoprint = [gps.datetimevec(gps.datetime),
-                                 gps.heading,
+                fieldstoprint = (gps.datetimevec_numeric(gps.datetime) +
+                                 [gps.heading,
                                  gps.roll,
                                  gps.pitch,
                                  gps.heave,
                                  gps.rollaccuracy,
                                  gps.headingaccuracy,
                                  gps.headingalgorithm,
-                                 gps.imustatus]
+                                 gps.imustatus])
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                                      
@@ -1215,13 +1215,13 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
       
-                fieldstoprint = [gps.datetimevec(gps.datetime), 
-                                 gps.latitude, 
+                fieldstoprint = (gps.datetimevec_numeric(gps.datetime) + 
+                                 [gps.latitude, 
                                  gps.longitude, 
                                  gps.quality,
                                  gps.svs, 
                                  gps.dop, 
-                                 gps.eht]
+                                 gps.eht])
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
 
@@ -1244,6 +1244,10 @@ if __name__ == '__main__':
             columnnames = timenames + fieldnames 
             if PCtime:
                 columnnames = map(lambda x: 'PC_'+ x,timenames) + columnnames
+
+            if verbose:
+                print('Columns: %s' % ",".join(columnnames))
+                print(data)
             df = pd.DataFrame(data,columns = columnnames)
             datakey = '/'+stringtype
             if verbose:
