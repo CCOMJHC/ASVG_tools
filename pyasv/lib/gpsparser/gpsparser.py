@@ -80,6 +80,11 @@ import dateutil.parser
 import re
 from operator import xor
 import pandas as pd
+try:
+    import epdb
+except:
+    pass
+
 
 # A function for writing to standard error vs standard out. 
 def eprint(*args, **kwargs):
@@ -938,7 +943,8 @@ if __name__ == '__main__':
             outfilename = None        
         
         HAVEDATA = False
-
+        linecount = 0
+        PCtimecount = 0
         for line in filetoread:
 
             HAVEDATA = True
@@ -965,7 +971,8 @@ if __name__ == '__main__':
             'Only handle string specified'
             if gps.id != stringtype:
                 continue
-    
+
+            linecount += 1.0    
             '''Since GPS NMEA strings have no date, we have to create one. If the
             data is timestaped with an ISO format time, then use that. If not, 
             use the system time.'''
@@ -976,6 +983,20 @@ if __name__ == '__main__':
                 PCtime = gps.stripepochtime()
             if PCtime == None:
                 PCtime = gps.strip_timestamp()
+
+            # We need a robust way to know to expect leading PC timestamps or not
+            # and to skip lines that have them that should not.
+            if PCtime is not None:
+                PCtimecount = PCtimecount + 1.0
+            #print("PCTIME: %s" % PCtime)
+            #print("PCtimecount: %f" % PCtimecount)
+            #print("linecount: %f" % linecount)
+            SHOULDHAVEPCTIME = PCtimecount / linecount > .5
+            #print("SHOULDHAVEPCTIME: %d" % SHOULDHAVEPCTIME)
+            if PCtime is None and SHOULDHAVEPCTIME:
+                continue
+            elif PCtime is not None and not SHOULDHAVEPCTIME:
+                continue
 
             # Many GPS strings have only a time stamp with no date. Here we try to 
             # use the date provided by a PC time stamp during the logging porcess.
@@ -1091,14 +1112,14 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
                       
-                fieldstoprint = (gps.datetimevec_numeric(gps.datetime) +
-                                 [gps.residualrms,
+                fieldstoprint = ([gps.residualrms,
                                  gps.semimajor,
                                  gps.semiminor,
                                  gps.orientation,
                                  gps.lat1sigma,
                                  gps.lon1sigma,
                                  gps.height1sigma])
+
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                                       
@@ -1120,8 +1141,7 @@ if __name__ == '__main__':
                     raise
                       
                     
-                fieldstoprint = (gps.datetimevec_numeric(PCtime) +  
-                                 [gps.PRN,
+                fieldstoprint = ([gps.PRN,
                                  gps.elevation,
                                  gps.azimuth,
                                  gps.snr])
@@ -1146,12 +1166,12 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
       
-                fieldstoprint = (gps.datetimevec_numeric(PCtime) +
-                                [gps.cog,
+                fieldstoprint = ([gps.cog,
                                 gps.knots,
                                 gps.kmph])
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
+                    
                                              
             if gps.id == 'HDT':
                 try:
@@ -1169,8 +1189,8 @@ if __name__ == '__main__':
                     eprint("Unexpected error:", sys.exc_info()[0])
                     raise
                     
-                fieldstoprint = (gps.datetimevec_numeric(PCtime) +
-                                 [gps.heading])
+                fieldstoprint = ([gps.heading])
+
                 if PCtime:
                     fieldstoprint = gps.datetimevec_numeric(PCtime) + fieldstoprint
                 
@@ -1256,10 +1276,11 @@ if __name__ == '__main__':
                 stringtype == 'GSV' or 
                 stringtype == 'HDT' or
                 stringtype == 'GSV'):
-                fieldnames = fieldnames[1:]
+                columnnames = fieldnames[1:]
             else:
                 fieldnames = fieldnames[2:]
-            columnnames = timenames + fieldnames 
+                columnnames = timenames + fieldnames 
+
             if PCtime:
                 columnnames = map(lambda x: 'PC_'+ x,timenames) + columnnames
 
