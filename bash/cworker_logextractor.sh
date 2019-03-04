@@ -347,7 +347,7 @@ for datadir in ${datadirs[@]}; do
     if [ "$DO0183" = 1 ]; then
 	echo ""
 	echo "Parsing nmea0183 logs..."
-	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -d \"${ccscm}/scm-vp/${datadir}\" -o \"${complete_outputdir}\""
+	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea0183.py -5 -d \"${ccscm}/scm-vp/${datadir}\" -o \"${complete_outputdir}\""
 	asv_exec "${CMD}" "${VERBOSE}"
 	echo ""
     fi
