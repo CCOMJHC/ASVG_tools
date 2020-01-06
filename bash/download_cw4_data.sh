@@ -58,6 +58,9 @@ if [ "$network" == 2 ]; then
 	VP="192.168.101.10"
 fi
 
+echo "Rate limit? [y/N]?"
+read RATELIMIT
+
 echo "Reading available directories"
 alllogdirs=`ssh unmanned@$VP ls -1 /home/unmanned/ccscm/scm-vp/`
 
