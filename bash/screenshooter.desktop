@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Name=Screenshooter
+Comment=Script to take screen shots at regular intervals.
+Exec=/usr/bin/gnome-terminal -x /home/unmanned/gitsrc/ASVG_tools/bash/screenshooter.sh
+Icon=/home/unmanned/gitsrc/ASVG_tools/bash/screenshooter.png
+Terminal=false
+Type=Application
