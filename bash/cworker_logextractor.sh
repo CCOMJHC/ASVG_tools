@@ -31,8 +31,12 @@ PRINTHELP=0
 GOTOUTPUT=0
 VERBOSE=0
 PARALLEL=0
+# LOGVERSION
+# ASView Bridge Version 7.0 (original): 0
+# ASView Bridge Version 7.1 (April 2019): 1 (default)
+LOGVERSION=1
 
-while getopts ":rewqhad:o:v" opt; do
+while getopts ":rewqhad:o:l:v" opt; do
 
     case $opt in 
 	r) 
@@ -66,6 +70,9 @@ while getopts ":rewqhad:o:v" opt; do
 	v)
 	    VERBOSE=1
 	    ;;
+        l)  
+            LOGVERSION=${OPTARG}
+            ;;
 	\?)
 	    echo "Invalid option: $OPTARG" >&2
 	    exit 1
@@ -111,7 +118,7 @@ if [ "$PRINTHELP" == 1 ]; then
 
     echo ""
     echo "USAGE: "
-    echo "    cworker_log_extractor.sh [-r|-e|-w|-q|-a] [-h] -d <path/to/ccscm> \ "
+    echo "    cworker_log_extractor.sh [-r|-e|-w|-q|-a] [-l 0|1] [-h] -d <path/to/ccscm> \ "
     echo "           -o [/path/to/output/dir]"
     echo ""
     echo "  -r extracts the CW4 logs from their binary form to CSV files."
@@ -122,6 +129,13 @@ if [ "$PRINTHELP" == 1 ]; then
     echo "  -w extracts data from the nmea2000 log files. (calls parsenmea2000.py)"
     echo "  -q extracts data from the nmea1830 log files. (calls parsenmea0183.py, which in turn calls gpsparser.py)"
     echo "  -a does all of these. "
+    echo "  -l [0|1]: Selects log type (1 is default). See note below."
+    echo ""
+    echo "   In April 2019, ASView Bridge was upgraded from v7.0 to 7.1."
+    echo "   This broke the template for extracting the ASV pilot logs."
+    echo "   To extract logs from prior to April 2019, specify: -l 0"
+    echo "   To extract logs from after Aprilf 2019, specify: -l 1"
+    echo "   -l 1 is the default"
     echo ""
     echo ""
     echo "Logs will be extracted for the selected log directories"
@@ -288,8 +302,13 @@ for datadir in ${datadirs[@]}; do
 
     # Non parallel execution
     if [ "$DOCW4" == 1 ]; then
-    	
-    	CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
+    
+        if [ "$LOGVERSION" == 0 ]; then	
+    	    CMD="${ASVG_TOOLS}/bash/create_export_config.sh ${complete_outputdir} > ${outputspec}"
+        fi
+        if [ "$LOGVERSION" == 1 ]; then
+    	    CMD="${ASVG_TOOLS}/bash/create_export_config_7p1.sh ${complete_outputdir} > ${outputspec}"
+        fi
     	asv_exec "${CMD}" "${VERBOSE}"
     fi
 
