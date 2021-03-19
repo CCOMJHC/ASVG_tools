@@ -28,6 +28,11 @@ parser.add_argument("-x", "--dryrun",
                     action = "store_true",
                     default = False,
                     help = "Look for log files, don't parse or convert them.")
+
+parser.add_argument("-f", "--outformat",
+                    action = "store",
+                    default = 'hdf',
+                    help = "Specify the output format. [mat|hdf] (hdf is default)")
 parser.add_argument("-v", "--verbosity",
                     action = "count",
                     default = 0,
@@ -44,6 +49,7 @@ directory =         args.directory
 dryrun =            args.dryrun
 verbose =           args.verbosity
 outputdir =         args.outputdir
+outputformat=       args.outformat
 
 if directory.startswith('"') and directory.endswith('"'):
     directory = directory[1:-1]
@@ -76,7 +82,11 @@ for csvfile in csvfilestoprocess:
     log = asvlog.asvlog.asvlog(csvfile)
 
     # Specify the output .mat file name.
-    outmatfilename = os.path.basename(csvfile).replace('csv','mat')
+    if outputformat == 'mat':
+        outmatfilename = os.path.basename(csvfile).replace('csv','mat')
+    else:
+        outmatfilename = os.path.basename(csvfile).replace('csv','hdf')
+
 
     # Specify the output directory name.
     # Default is the cwd ('./'). -i gives the input directory. 
@@ -86,15 +96,20 @@ for csvfile in csvfilestoprocess:
     try:
         if not dryrun:
             log.parse()
+            # Save the data.
+            print "Writing " + os.path.join(outputdir,outmatfilename)
+            if not dryrun:
+                if outputformat == 'mat':
+                    log.save_to_mat(matfilename = os.path.join(outputdir,outmatfilename), verbosity=verbose )
+                else:
+                    log.save_to_hdf(hdffilename = os.path.join(outputdir,outmatfilename), verbosity=verbose )
+
+
     except:
         statinfo = os.stat(csvfile)
         MB = statinfo.st_size / 1024 / 1024
         print "Failed parsing " + csvfile + " " + str(MB) +  " MB"
         continue
-    # Save the data.
-    print "Writing " + os.path.join(outputdir,outmatfilename)
-    if not dryrun:
-        log.save_to_mat(matfilename = os.path.join(outputdir,outmatfilename), verbosity=verbose )
 
 
 

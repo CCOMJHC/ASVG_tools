@@ -105,9 +105,21 @@ class asvlog(object):
                                 )
         return H
         
+    def save_to_hdf(self,hdffilename = '', verbosity=0):
+        '''
+        Method to save pandas dataframe to HDF5
+        '''
+        if verbosity > 2:
+            print("Writing to HDF5.")
+        
+        self.data.to_hdf(hdffilename,'data')
+
     def save_to_mat(self,matfilename = '',verbosity = 0):
         '''
         Method to save to MATLAB format
+
+        NOTE: This method is broken for logs collected in ASView Bridge 7.1
+              The field names are too long for MATLAB.
         '''
       
         # A tricky way to convert the DataFrame to a dictionary.
