@@ -106,6 +106,7 @@ echo "DO HEL: $PRINTHELP"
 echo "VERBOS: $VERBOSE"
 echo "IN DIR: $ccscm"
 echo "OU DIR: $outputdir"
+echo "LOGVERSION: $LOGVERSION"
 fi
 
 # Exporting these to make them globally accessible. 
@@ -357,7 +358,7 @@ for datadir in ${datadirs[@]}; do
 
     if [ "$DOCSV" == 1 ]; then
 	echo ""
-	echo "Parsing CSV files for MATLAB."
+	echo "Parsing CSV files"
 	CMD="${ASVG_TOOLS}/pyasv/bin/parsecsv.py -d \"${complete_outputdir}\" -o i"
 	asv_exec "${CMD}" "${VERBOSE}"
 	echo ""
@@ -371,7 +372,7 @@ for datadir in ${datadirs[@]}; do
 	echo ""
     fi
 
-    if [ "$DO2000" = 1 ]; then
+    if [ "$DO2000" = 1 ] && [ "$LOGVERSION" = 0 ]; then
 	echo "Parsing nmea2000 logs..."
 	CMD="${ASVG_TOOLS}/pyasv/bin/parsenmea2000.py -d ${ccscm}/scm-vp/${datadir} -o ${complete_outputdir}"
 	asv_exec "${CMD}" "${VERBOSE}"

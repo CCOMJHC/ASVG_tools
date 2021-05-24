@@ -97,32 +97,31 @@
  <outputConfig>
   <type>csv</type>
   <requiredData>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":0</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":1</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":2</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":3</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":4</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":5</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":6</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":7</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":8</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":9</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":10</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":11</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":12</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":13</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":14</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":15</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":16</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":17</id>
-   <id>"Service Manager":"vehicle/c-worker-4/vehicle":5:"c-worker-4.vehicle(0)":18</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":0</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":1</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":2</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":3</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":4</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":5</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":6</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":7</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":8</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":9</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":10</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":11</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":12</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":13</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":14</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":15</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":16</id>
+   <id>"Service Manager":"core/vehicleSensor":5:"vehicle(0)":17</id>
   </requiredData>
   <csvConfig>
    <timeFormat>absolute</timeFormat>
    <enumFormat>numeric</enumFormat>
    <signSuffix>disable</signSuffix>
    <columnHeaders>enable</columnHeaders>
-   <filename>OUTPUTDIR/vehicle.csv</filename>
+   <filename>OUTPUTDIR/vehicleSensor.csv</filename>
   </csvConfig>
  </outputConfig>
  <outputConfig>
@@ -184,25 +183,6 @@
    <filename>OUTPUTDIR/vehicle_processor.csv</filename>
   </csvConfig>
  </outputConfig>
-<outputConfig>
-  <type>csv</type>
-  <requiredData>
-   <id>"scm":2:12:0</id>
-   <id>"scm":2:12:1</id>
-   <id>"scm":2:12:2</id>
-   <id>"scm":2:12:3</id>
-   <id>"scm":2:12:4</id>
-   <id>"scm":2:12:5</id>
-   <id>"scm":2:12:6</id>
-   <id>"scm":2:12:7</id>
-  </requiredData>
-  <csvConfig>
-   <timeFormat>absolute</timeFormat>
-   <enumFormat>numeric</enumFormat>
-   <signSuffix>disable</signSuffix>
-   <columnHeaders>enable</columnHeaders>
-   <filename>OUTPUTDIR/vs_remotecontrol.csv</filename>
-  </csvConfig>
 </outputConfig>
 <outputConfig>
   <type>csv</type>
@@ -229,6 +209,56 @@
    <signSuffix>disable</signSuffix>
    <columnHeaders>enable</columnHeaders>
    <filename>OUTPUTDIR/alarms.csv</filename>
+  </csvConfig>
+ </outputConfig>
+ <outputConfig>
+  <type>csv</type>
+  <requiredData>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":0</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":1</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":2</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":3</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":4</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":5</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":6</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":7</id>
+   <id>"Service Manager":"scm/vp/timeref":5:"timeref(2)":8</id>
+  </requiredData>
+  <csvConfig>
+   <timeFormat>absolute</timeFormat>
+   <enumFormat>numeric</enumFormat>
+   <signSuffix>disable</signSuffix>
+   <columnHeaders>enable</columnHeaders>
+   <filename>OUTPUTDIR/timeref.csv</filename>
+  </csvConfig>
+ </outputConfig>
+ <outputConfig>
+  <type>csv</type>
+  <requiredData>
+   <id>"scm":5:17:9:0:2:5</id>
+   <id>"scm":5:17:10:0:2:5</id>
+  </requiredData>
+  <csvConfig>
+   <timeFormat>absolute</timeFormat>
+   <enumFormat>numeric</enumFormat>
+   <signSuffix>disable</signSuffix>
+   <columnHeaders>enable</columnHeaders>
+   <filename>OUTPUTDIR/fuelflow.csv</filename>
+  </csvConfig>
+ </outputConfig>
+ <outputConfig>
+  <type>csv</type>
+  <requiredData>
+   <id>"scm":5:17:2:0:1:1</id>
+   <id>"scm":5:17:2:0:1:2</id>
+   <id>"scm":5:17:2:0:1:38</id>
+  </requiredData>
+  <csvConfig>
+   <timeFormat>absolute</timeFormat>
+   <enumFormat>numeric</enumFormat>
+   <signSuffix>disable</signSuffix>
+   <columnHeaders>enable</columnHeaders>
+   <filename>OUTPUTDIR/compass.csv</filename>
   </csvConfig>
  </outputConfig>
 </outputs>
